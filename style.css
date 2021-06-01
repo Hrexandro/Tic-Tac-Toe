@@ -1,0 +1,27 @@
+body{
+    display:flex;
+    flex-direction: column;
+    align-items: center;  
+    background:black;
+}
+#game-board{
+
+    place-items: center;
+    align-items: center;
+    text-align: center;
+    justify-items: center;
+    display: grid;
+    grid-template-columns: 50px 50px 50px;
+    grid-template-rows: 50px 50px 50px;
+}
+
+#field {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background:white;
+    height:98%;
+    width:99%;
+    
+
+}
