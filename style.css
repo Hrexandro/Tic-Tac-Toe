@@ -2,8 +2,24 @@ body{
     display:flex;
     flex-direction: column;
     align-items: center;  
-    background:black;
+    background:rgb(233, 128, 128);
 }
+#game-area{
+    width:60%;
+    margin-top:5%;
+    display:flex;
+    justify-content: space-between;
+    
+}
+
+input[type=text]{
+    width:7vw;
+}
+
+h1{
+    margin:0;
+}
+
 #game-board{
 
     place-items: center;
@@ -15,7 +31,7 @@ body{
     grid-template-rows: 50px 50px 50px;
 }
 
-.field {
+.field{
     display: flex;
     justify-content: center;
     align-items: center;
