@@ -68,21 +68,30 @@ const players = (function(){
         let one = playerMaker(1);
         let two = playerMaker(2);
         console.log(one)
+
         function assignName(input,playerObject){
             console.log(playerObject)
             playerObject.name = input
+        }
+
+        function replaceNameEntryFieldWithName(playerName, event){
+            event.target.parentNode.innerHTML=`<h1>${playerName}</h1>`;
         }
 
         const playerOneButton = document.getElementById("ok-player-one")
         const playerTwoButton = document.getElementById("ok-player-two")
     
         function nameButtonFunctionalityAdder(button, nameField, player){
-            button.addEventListener('click',()=>{
-                assignName(nameField.value,player)
+            button.addEventListener('click',(event)=>{
+                assignName(nameField.value,player);
+                console.log(player.number)
+                replaceNameEntryFieldWithName(nameField.value, event);
             })
         }
         nameButtonFunctionalityAdder(playerOneButton,document.getElementById("player-one-name-field"),one)
         nameButtonFunctionalityAdder(playerTwoButton,document.getElementById("player-two-name-field"),two)
+
+
         // playerOneButton.addEventListener('click',()=>{
         //     assignName(document.getElementById("player-one-name-field").value,players.one)
         // })
