@@ -1,5 +1,7 @@
 /*
 what should the player and game objects do?
+
+add elements after players set themselves up
 */
 const gameBoard = (function(){
     let boardArray=[];
@@ -12,14 +14,17 @@ const gameBoard = (function(){
     //display the gameBoard on the screen
     let gameBoardElement = document.getElementById('game-board');
 
-    for (i=0;i<9;i++){//add the elements
-        let newField = document.createElement('div');
-        newField.setAttribute('id',`${i}`);//maybe introduce better naming to specify row and column?
-        newField.setAttribute('class','field')
-        gameBoardElement.appendChild(newField)
-        newField.addEventListener('click',fillField)
-        
+    function setUpBoard(){
+        for (i=0;i<9;i++){//add the elements
+            let newField = document.createElement('div');
+            newField.setAttribute('id',`${i}`);//maybe introduce better naming to specify row and column?
+            newField.setAttribute('class','field')
+            gameBoardElement.appendChild(newField)
+            newField.addEventListener('click',fillField)
+            
+        }
     }
+
 
     function fillField (event){
         console.log(event);
@@ -38,6 +43,7 @@ const gameBoard = (function(){
     return {
         fillField,
         boardArray,
+        setUpBoard,
     }
 
 })();
@@ -48,6 +54,7 @@ const players = (function(){
     function playerMaker(number) {
         let player = Object.create(playerMaker.proto);
             player.number = number;
+            player.named = false
 
             if (player.number === 1){
                 player.sign="O";
@@ -86,11 +93,18 @@ const players = (function(){
                 assignName(nameField.value,player);
                 console.log(player.number)
                 replaceNameEntryFieldWithName(nameField.value, event);
+                player.named=true;
+                checkIfBoardCanBeCreatedYet();
             })
         }
         nameButtonFunctionalityAdder(playerOneButton,document.getElementById("player-one-name-field"),one)
         nameButtonFunctionalityAdder(playerTwoButton,document.getElementById("player-two-name-field"),two)
 
+        function checkIfBoardCanBeCreatedYet(){
+            if (one.named===true&&two.named===true){
+                gameBoard.setUpBoard();
+            }
+        }
 
         // playerOneButton.addEventListener('click',()=>{
         //     assignName(document.getElementById("player-one-name-field").value,players.one)
