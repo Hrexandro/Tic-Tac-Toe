@@ -2,6 +2,14 @@
 what should the player and game objects do?
 
 add elements after players set themselves up
+
+choosing X or O
+
+block from filling fields after winning
+
+display score
+
+reset board and play another round
 */
 const gameBoard = (function(){
     let boardArray=[];
@@ -29,8 +37,8 @@ const gameBoard = (function(){
     function fillField (event){
         console.log(event);
         console.log(game.currentPlayer);
-        console.log(game.currentPlayer);
-        if (event.target.innerText===""){
+        console.log(game.postGame)
+        if (event.target.innerText===""&&game.postGame===false){//if field is empty and we are not in the aftermath of a game
             console.log(game.currentPlayer)
             console.log(players.one)
             event.target.innerText = `${game.currentPlayer.sign}`;
@@ -55,6 +63,7 @@ const players = (function(){
         let player = Object.create(playerMaker.proto);
             player.number = number;
             player.named = false
+            player.score = 0
 
             if (player.number === 1){
                 player.sign="O";
@@ -124,6 +133,8 @@ const game = (function(){
     let winner;
     let Xes =[];
     let Os = [];
+    let postGame = false; //after the game, you should not be able to fill more fields
+    console.log(postGame)
     let winningCombinations =[
         [0,1,2],
         [3,4,5],
@@ -147,15 +158,21 @@ const game = (function(){
         }
         for (i=0; i<winningCombinations.length;i++){
             if (winningCombinations[i].every(element => Os.includes(element))){
-                console.log("O wins")
+                endGame(players.one);
             }
             else if (winningCombinations[i].every(element => Xes.includes(element))){
-                console.log("X wins")
+                endGame(players.two);
             }
         }
     }
 
-
+    function endGame(winner){
+        console.log(`${winner.name} wins`)
+        winner.score++;
+        console.log(postGame);
+        postGame=true;
+        console.log(postGame)
+    }
 
     return {
         currentPlayer,
@@ -163,7 +180,7 @@ const game = (function(){
         Xes,
         Os,
         checkIfSomeoneWon,
-        
+        postGame
     }
 
 })();
