@@ -38,7 +38,7 @@ const gameBoard = (function(){
         console.log(event);
         console.log(game.currentPlayer);
         console.log(game.postGame)
-        if (event.target.innerText===""&&game.postGame===false){//if field is empty and we are not in the aftermath of a game
+        if (event.target.innerText===""&&game.getPostGame()===false){//if field is empty and we are not in the aftermath of a game
             console.log(game.currentPlayer)
             console.log(players.one)
             event.target.innerText = `${game.currentPlayer.sign}`;
@@ -130,8 +130,7 @@ const players = (function(){
 
 const game = (function(){
     let currentPlayer=players.one;
-    let winner;
-    let Xes =[];
+    let Xes = [];
     let Os = [];
     let postGame = false; //after the game, you should not be able to fill more fields
     console.log(postGame)
@@ -145,6 +144,14 @@ const game = (function(){
         [0,4,8],
         [6,4,2]
     ]
+    function getPostGame(){
+        return postGame
+    }
+
+    function setPostGame(value){
+        return postGame = value
+    }
+
     function checkIfSomeoneWon(){
         for (i=0; i<gameBoard.boardArray.length; i++) {
             if (gameBoard.boardArray[i]==="O"&&!Os.includes(i)){
@@ -170,17 +177,17 @@ const game = (function(){
         console.log(`${winner.name} wins`)
         winner.score++;
         console.log(postGame);
-        postGame=true;
-        console.log(postGame)
+        setPostGame(true);
+        console.log(postGame);
     }
 
     return {
         currentPlayer,
-        winner,
         Xes,
         Os,
         checkIfSomeoneWon,
-        postGame
+        getPostGame,
+        setPostGame,
     }
 
 })();
