@@ -19,6 +19,14 @@ input[type=text]{
 h1{
     margin:0;
 }
+#new-game-button{
+    width:100%;
+    margin-top:10px;
+    color: rgb(233, 128, 128);
+    background-color:white;
+    border:none;
+    border-radius:20%;
+}
 
 #game-board{
 

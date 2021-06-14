@@ -10,13 +10,19 @@ block from filling fields after winning
 display score
 
 reset board and play another round
+
+BUGS: when new game starts Xes and Os are empty but as soon as one of the fields is clicked, they are filled again with all the numbers from the previous game
+->added gameBoard.clearBoardArray(); - should take care of it
 */
 const gameBoard = (function(){
     let boardArray=[];
 
-    for (i=0;i<9;i++){//set the array to start as empty
-        boardArray.push(null)
+    function clearBoardArray(){
+        for (i=0;i<9;i++){//set the array to start as empty
+            boardArray.push(null)
+        }
     }
+    clearBoardArray();
     console.log(boardArray);
 
     //display the gameBoard on the screen
@@ -33,6 +39,20 @@ const gameBoard = (function(){
         }
     }
 
+    function addNewGameButton(){
+        let newGameButton = document.createElement('button');
+        newGameButton.innerText = "New Game";
+        gameBoardElement.appendChild(newGameButton);
+        newGameButton.setAttribute('id','new-game-button')
+        newGameButton.addEventListener('click',()=>{
+            game.startNewGame();
+        })
+    }
+
+    let newGameButton = document.createElement('button');
+    newGameButton.innerText = "New Game";
+
+    //gameBoardElement.appendChild(newGameButton)
 
     function fillField (event){
         console.log(event);
@@ -48,10 +68,20 @@ const gameBoard = (function(){
             
         }
     }
+    function clearGameBoard(){
+        Array.from(document.getElementsByClassName('field')).forEach((element)=>{
+            element.innerText = "";
+        })
+    }
+
+
     return {
         fillField,
         boardArray,
         setUpBoard,
+        addNewGameButton,
+        clearGameBoard,
+        clearBoardArray,
     }
 
 })();
@@ -103,17 +133,13 @@ const players = (function(){
                 console.log(player.number)
                 replaceNameEntryFieldWithName(nameField.value, event);
                 player.named=true;
-                checkIfBoardCanBeCreatedYet();
+                game.checkIfBoardCanBeCreatedYet();
             })
         }
         nameButtonFunctionalityAdder(playerOneButton,document.getElementById("player-one-name-field"),one)
         nameButtonFunctionalityAdder(playerTwoButton,document.getElementById("player-two-name-field"),two)
 
-        function checkIfBoardCanBeCreatedYet(){
-            if (one.named===true&&two.named===true){
-                gameBoard.setUpBoard();
-            }
-        }
+
 
         // playerOneButton.addEventListener('click',()=>{
         //     assignName(document.getElementById("player-one-name-field").value,players.one)
@@ -179,6 +205,21 @@ const game = (function(){
         console.log(postGame);
         setPostGame(true);
         console.log(postGame);
+        gameBoard.addNewGameButton();
+    }
+
+    function checkIfBoardCanBeCreatedYet(){
+        if (players.one.named===true&&players.two.named===true){
+            gameBoard.setUpBoard();
+        }
+    }
+
+    function startNewGame(){
+        Xes.splice(0,5);//remove all elements, can't change to empty because it does the thing then
+        Os.splice(0,5);
+        gameBoard.clearGameBoard();
+        gameBoard.clearBoardArray();
+        setPostGame(false);
     }
 
     return {
@@ -188,6 +229,8 @@ const game = (function(){
         checkIfSomeoneWon,
         getPostGame,
         setPostGame,
+        checkIfBoardCanBeCreatedYet,
+        startNewGame,
     }
 
 })();
