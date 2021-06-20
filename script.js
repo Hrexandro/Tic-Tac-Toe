@@ -1,25 +1,19 @@
 /*
-what should the player and game objects do?
 
-add elements after players set themselves up
+TO DO:
+- display score
+- display current player whose turn it is
+- display who has which symbol
+- reposition newGameButton out of the grid to a more central and aesthetic position
 
-choosing X or O
 
-block from filling fields after winning
-
-display score
-
-reset board and play another round
-
-BUGS: when new game starts Xes and Os are empty but as soon as one of the fields is clicked, they are filled again with all the numbers from the previous game
-->added gameBoard.clearBoardArray(); - should take care of it
 */
 const gameBoard = (function(){
     let boardArray=[];
 
     function clearBoardArray(){
         for (i=0;i<9;i++){//set the array to start as empty
-            boardArray.push(null)
+            boardArray[i] = null;
         }
     }
     clearBoardArray();
@@ -49,8 +43,12 @@ const gameBoard = (function(){
         })
     }
 
-    let newGameButton = document.createElement('button');
-    newGameButton.innerText = "New Game";
+    function removeNewGameButton(){
+        gameBoardElement.removeChild(document.getElementById("new-game-button"))
+    }
+
+    // let newGameButton = document.createElement('button');//was this needed?
+    // newGameButton.innerText = "New Game";
 
     //gameBoardElement.appendChild(newGameButton)
 
@@ -82,6 +80,8 @@ const gameBoard = (function(){
         addNewGameButton,
         clearGameBoard,
         clearBoardArray,
+        removeNewGameButton,
+        
     }
 
 })();
@@ -220,6 +220,7 @@ const game = (function(){
         gameBoard.clearGameBoard();
         gameBoard.clearBoardArray();
         setPostGame(false);
+        gameBoard.removeNewGameButton();
     }
 
     return {
