@@ -5,7 +5,7 @@ TO DO:
 - display current player whose turn it is
 - display who has which symbol
 - reposition newGameButton out of the grid to a more central and aesthetic position
-
+- make underlineActivePlayer() nicer
 
 */
 const gameBoard = (function(){
@@ -52,6 +52,17 @@ const gameBoard = (function(){
 
     //gameBoardElement.appendChild(newGameButton)
 
+    ///////////////////////////////////////////////////
+    function underlineActivePlayer(){
+        if (game.getPostGame()){
+            document.getElementById("X").classList.remove("underlined");
+            document.getElementById("O").classList.remove("underlined");
+        }
+        else if (players.one.name&&players.two.name){
+            (game.currentPlayer.sign === "O") ? (document.getElementById("O").classList.add("underlined"), document.getElementById("X").classList.remove("underlined")) : (document.getElementById("X").classList.add("underlined"), document.getElementById("O").classList.remove("underlined"))
+        }
+    }
+
     function fillField (event){
         console.log(event);
         console.log(game.currentPlayer);
@@ -62,6 +73,7 @@ const gameBoard = (function(){
             event.target.innerText = `${game.currentPlayer.sign}`;
             boardArray[event.target.getAttribute('id')] = game.currentPlayer.sign;
             (game.currentPlayer===players.one)? game.currentPlayer=players.two : game.currentPlayer=players.one;  
+            underlineActivePlayer();///////////////////
             game.checkIfSomeoneWon();
             
         }
@@ -81,7 +93,7 @@ const gameBoard = (function(){
         clearGameBoard,
         clearBoardArray,
         removeNewGameButton,
-        
+        underlineActivePlayer,
     }
 
 })();
@@ -120,9 +132,11 @@ const players = (function(){
             playerObject.name = input
         }
 
-        function replaceNameEntryFieldWithName(playerName, event){
-            event.target.parentNode.innerHTML=`<h1>${playerName}</h1>`;
+        function replaceNameEntryFieldWithName(playerName, event, player){//move to gameBoard?
+            event.target.parentNode.innerHTML=`<h1 class="name" id="${player.sign}">${playerName}</h1>`;
+            gameBoard.underlineActivePlayer();
         }
+
 
         const playerOneButton = document.getElementById("ok-player-one")
         const playerTwoButton = document.getElementById("ok-player-two")
@@ -131,7 +145,7 @@ const players = (function(){
             button.addEventListener('click',(event)=>{
                 assignName(nameField.value,player);
                 console.log(player.number)
-                replaceNameEntryFieldWithName(nameField.value, event);
+                replaceNameEntryFieldWithName(nameField.value, event, player);
                 player.named=true;
                 game.checkIfBoardCanBeCreatedYet();
             })
@@ -206,6 +220,7 @@ const game = (function(){
         setPostGame(true);
         console.log(postGame);
         gameBoard.addNewGameButton();
+        gameBoard.underlineActivePlayer();
     }
 
     function checkIfBoardCanBeCreatedYet(){
@@ -221,6 +236,7 @@ const game = (function(){
         gameBoard.clearBoardArray();
         setPostGame(false);
         gameBoard.removeNewGameButton();
+        gameBoard.underlineActivePlayer();
     }
 
     return {
