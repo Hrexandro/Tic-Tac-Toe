@@ -2,10 +2,9 @@
 
 TO DO:
 - display score
-- display current player whose turn it is
 - display who has which symbol
 - reposition newGameButton out of the grid to a more central and aesthetic position
-- make underlineActivePlayer() nicer
+
 
 */
 const gameBoard = (function(){
@@ -36,7 +35,7 @@ const gameBoard = (function(){
     function addNewGameButton(){
         let newGameButton = document.createElement('button');
         newGameButton.innerText = "New Game";
-        gameBoardElement.appendChild(newGameButton);
+        document.getElementById("center-column").appendChild(newGameButton);
         newGameButton.setAttribute('id','new-game-button')
         newGameButton.addEventListener('click',()=>{
             game.startNewGame();
@@ -54,12 +53,21 @@ const gameBoard = (function(){
 
     ///////////////////////////////////////////////////
     function underlineActivePlayer(){
+        let playerO = document.getElementById("O");
+        let playerX = document.getElementById("X");
         if (game.getPostGame()){
             document.getElementById("X").classList.remove("underlined");
             document.getElementById("O").classList.remove("underlined");
         }
         else if (players.one.name&&players.two.name){
-            (game.currentPlayer.sign === "O") ? (document.getElementById("O").classList.add("underlined"), document.getElementById("X").classList.remove("underlined")) : (document.getElementById("X").classList.add("underlined"), document.getElementById("O").classList.remove("underlined"))
+            if (game.currentPlayer.sign === "O"){
+                playerO.classList.add("underlined");
+                playerX.classList.remove("underlined");
+            }
+            else {
+                playerX.classList.add("underlined");
+                playerO.classList.remove("underlined");
+            }
         }
     }
 
