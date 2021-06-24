@@ -1,10 +1,12 @@
 /*
 
 TO DO:
-- display score
+
 - display who has which symbol
 - reposition newGameButton out of the grid to a more central and aesthetic position
-
+- make it look better
+-add choosing single or multiplayer
+-program the AI
 
 */
 const gameBoard = (function(){
@@ -20,6 +22,7 @@ const gameBoard = (function(){
 
     //display the gameBoard on the screen
     let gameBoardElement = document.getElementById('game-board');
+    let centerColumnElement = document.getElementById('center-column');
 
     function setUpBoard(){
         for (i=0;i<9;i++){//add the elements
@@ -43,7 +46,7 @@ const gameBoard = (function(){
     }
 
     function removeNewGameButton(){
-        gameBoardElement.removeChild(document.getElementById("new-game-button"))
+        centerColumnElement.removeChild(document.getElementById("new-game-button"));
     }
 
     // let newGameButton = document.createElement('button');//was this needed?
@@ -220,15 +223,34 @@ const game = (function(){
             }
         }
     }
-
+    let playerOneArea = document.getElementById("player-one-area");
+    let playerTwoArea = document.getElementById("player-two-area");
     function endGame(winner){
-        console.log(`${winner.name} wins`)
+        console.log(`${winner.name} wins`);
         winner.score++;
         console.log(postGame);
         setPostGame(true);
         console.log(postGame);
         gameBoard.addNewGameButton();
         gameBoard.underlineActivePlayer();
+        function displayScore(player,playerArea){
+            let score = document.createElement('p');
+            score.setAttribute('class','score')
+            playerArea.appendChild(score);
+            score.innerText=`Score: ${player.score}`
+        }
+        function updateScore(){
+            playerOneArea.querySelector('.score').innerText = `Score: ${players.one.score}`
+            playerTwoArea.querySelector('.score').innerText = `Score: ${players.two.score}`
+        }
+
+        if (!playerOneArea.querySelector('p')){
+            displayScore(players.one, playerOneArea);
+            displayScore(players.two, playerTwoArea);
+        }
+        else {
+            updateScore();
+        }
     }
 
     function checkIfBoardCanBeCreatedYet(){
