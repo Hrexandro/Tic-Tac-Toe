@@ -8,6 +8,7 @@ TO DO:
 -add choosing single or multiplayer
 -program the AI
 
+
 */
 const gameBoard = (function(){
     let boardArray=[];
@@ -204,6 +205,11 @@ const game = (function(){
     }
 
     function checkIfSomeoneWon(){
+        console.log('checkifsbwonruns')
+        if (!gameBoard.boardArray.includes(null)){
+            endGame(null)
+            console.log('runs')
+        }
         for (i=0; i<gameBoard.boardArray.length; i++) {
             if (gameBoard.boardArray[i]==="O"&&!Os.includes(i)){
                 console.log(i)
@@ -226,13 +232,17 @@ const game = (function(){
     let playerOneArea = document.getElementById("player-one-area");
     let playerTwoArea = document.getElementById("player-two-area");
     function endGame(winner){
-        console.log(`${winner.name} wins`);
-        winner.score++;
+
         console.log(postGame);
         setPostGame(true);
         console.log(postGame);
         gameBoard.addNewGameButton();
         gameBoard.underlineActivePlayer();
+        
+        if (winner!=null){//if it is not a tie
+            console.log(`${winner.name} wins`);
+            winner.score++;    
+        }
         function displayScore(player,playerArea){
             let score = document.createElement('p');
             score.setAttribute('class','score')
