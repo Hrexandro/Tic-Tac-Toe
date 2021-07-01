@@ -3,11 +3,14 @@
 TO DO:
 
 - display who has which symbol
-- reposition newGameButton out of the grid to a more central and aesthetic position
 - make it look better
 -add choosing single or multiplayer
 -program the AI
 
+
+- at start both name pickers should be hidden (add a hidden class that then gets removed)
+- after picking button they should become visible (only one if against AI - otherwise the computer name is appear)
+- then the gameboard -now it is ok
 
 */
 const gameBoard = (function(){
@@ -96,6 +99,27 @@ const gameBoard = (function(){
         })
     }
 
+    let playerOneArea = document.getElementById("player-one-area");
+    let playerTwoArea = document.getElementById("player-two-area");
+
+    function toggleHidden(){
+        for (i=0;i<arguments.length;i++){
+            arguments[i].classList.toggle('hidden');
+        }
+        console.log(arguments)
+    }
+
+    let gameplayButtons = document.getElementsByClassName("gameplay-button");
+
+    for (i=0;i<gameplayButtons.length;i++){
+        console.log(gameplayButtons[i])
+        gameplayButtons[i].addEventListener('click',(e)=>{
+            gameBoardElement.removeChild(e.target.parentNode)
+            toggleHidden(playerOneArea, playerTwoArea)
+            console.log(e.target.parentNode);
+        })
+    }
+
 
     return {
         fillField,
@@ -106,6 +130,8 @@ const gameBoard = (function(){
         clearBoardArray,
         removeNewGameButton,
         underlineActivePlayer,
+        playerOneArea,
+        playerTwoArea,
     }
 
 })();
@@ -229,8 +255,7 @@ const game = (function(){
             }
         }
     }
-    let playerOneArea = document.getElementById("player-one-area");
-    let playerTwoArea = document.getElementById("player-two-area");
+
     function endGame(winner){
 
         console.log(postGame);
@@ -250,13 +275,13 @@ const game = (function(){
             score.innerText=`Score: ${player.score}`
         }
         function updateScore(){
-            playerOneArea.querySelector('.score').innerText = `Score: ${players.one.score}`
-            playerTwoArea.querySelector('.score').innerText = `Score: ${players.two.score}`
+            gameBoard.playerOneArea.querySelector('.score').innerText = `Score: ${players.one.score}`
+            gameBoard.playerTwoArea.querySelector('.score').innerText = `Score: ${players.two.score}`
         }
 
-        if (!playerOneArea.querySelector('p')){
-            displayScore(players.one, playerOneArea);
-            displayScore(players.two, playerTwoArea);
+        if (!gameBoard.playerOneArea.querySelector('p')){
+            displayScore(players.one, gameBoard.playerOneArea);
+            displayScore(players.two, gameBoard.playerTwoArea);
         }
         else {
             updateScore();

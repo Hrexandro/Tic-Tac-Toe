@@ -20,11 +20,15 @@ h1{
     margin:0;
 }
 
+.hidden{
+    visibility:hidden;
+}
+
 #center-column{
     display:flex;
     flex-direction:column;
 }
-#new-game-button{
+#new-game-button, .gameplay-button{
     align-self: center;
     margin-top:10px;
     color: rgb(233, 128, 128);
@@ -34,12 +38,19 @@ h1{
 
 }
 
+#gameplay-picker{
+    display:flex;
+}
+
+.gameplay-button{
+    margin:10px;
+    width:4vw;
+    height:9vh;
+}
 
 .underlined{
     text-decoration: underline;
 }
-
-
 
 #game-board{
 
