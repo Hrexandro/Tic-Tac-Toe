@@ -117,6 +117,20 @@ const gameBoard = (function(){
             gameBoardElement.removeChild(e.target.parentNode)
             toggleHidden(playerOneArea, playerTwoArea)
             console.log(e.target.parentNode);
+            console.log(e.target)
+
+            //if against each other, do nothing else
+
+            //if against dumb AI, set the other player name to dumb AI, leave player 1 not set, have the AI do its thing
+            if (e.target.getAttribute('id')==='mindless-ai'){
+                console.log("picks mindless ai");
+                players.assignName('mindless AI', players.two);
+                players.two.named = true;
+                playerTwoArea.innerHTML=`<h1 class="name" id="${'X'}">${players.two.name}</h1>`;
+
+                //ok now have it do something ie it is moves
+            }
+            //if agains genius AI, the same but the AI behaves differently
         })
     }
 
@@ -171,6 +185,7 @@ const players = (function(){
         }
 
         function replaceNameEntryFieldWithName(playerName, event, player){//move to gameBoard?
+            console.log(event.target.parentNode)
             event.target.parentNode.innerHTML=`<h1 class="name" id="${player.sign}">${playerName}</h1>`;
             gameBoard.underlineActivePlayer();
         }
@@ -203,6 +218,8 @@ const players = (function(){
         return {
             one,
             two,
+            assignName,
+            replaceNameEntryFieldWithName,
         }
 })();
 
