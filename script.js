@@ -12,6 +12,9 @@ TO DO:
 - after picking button they should become visible (only one if against AI - otherwise the computer name is appear)
 - then the gameboard -now it is ok
 
+make the code more concise
+check what other users made
+
 */
 const gameBoard = (function(){
     let boardArray=[];
@@ -34,7 +37,7 @@ const gameBoard = (function(){
             newField.setAttribute('id',`${i}`);//maybe introduce better naming to specify row and column?
             newField.setAttribute('class','field')
             gameBoardElement.appendChild(newField)
-            newField.addEventListener('click',fillField)
+            newField.addEventListener('click',fillClickedField)
             
         }
     }
@@ -78,21 +81,43 @@ const gameBoard = (function(){
         }
     }
 
-    function fillField (event){
+    function fillClickedField (event){//fires when the field is clicked
         console.log(event);
         console.log(game.currentPlayer);
         console.log(game.postGame)
-        if (event.target.innerText===""&&game.getPostGame()===false){//if field is empty and we are not in the aftermath of a game
+        fillField(event.target);
+    }
+    
+    function fillField(field){//used to click field both when clicked and when the AI does its thing
+        if (field.innerText===""&&game.getPostGame()===false){//if field is empty and we are not in the aftermath of a game
             console.log(game.currentPlayer)
             console.log(players.one)
-            event.target.innerText = `${game.currentPlayer.sign}`;
-            boardArray[event.target.getAttribute('id')] = game.currentPlayer.sign;
+            field.innerText = `${game.currentPlayer.sign}`;
+            boardArray[field.getAttribute('id')] = game.currentPlayer.sign;
             (game.currentPlayer===players.one)? game.currentPlayer=players.two : game.currentPlayer=players.one;  
             underlineActivePlayer();///////////////////
-            game.checkIfSomeoneWon();
+            if(game.checkIfSomeoneWon(gameBoard.boardArray)===players.one){
+                game.endGame(players.one)
+            }
+            else if (game.checkIfSomeoneWon(gameBoard.boardArray)===players.two){
+                game.endGame(players.two)
+            }
             
+            if (game.getPostGame()===false){
+                game.AIPlayerActCheck();
+            }
         }
+        else if (field.innerText!==""){
+            game.AIPlayerActCheck();//if the random picker pix a pickd field, it pix again
+            return false;
+        }
+
     }
+
+
+
+
+
     function clearGameBoard(){
         Array.from(document.getElementsByClassName('field')).forEach((element)=>{
             element.innerText = "";
@@ -120,15 +145,30 @@ const gameBoard = (function(){
             console.log(e.target)
 
             //if against each other, do nothing else
-
+            function assignAIAttributes(id){
+                console.log(`picks ${id}`);
+                players.assignName(id, players.two);
+                players.two.named = true;
+                players.two.type="AI"
+                playerTwoArea.innerHTML=`<h1 class="name" id="${'X'}">${players.two.name}</h1>`;
+            }
             //if against dumb AI, set the other player name to dumb AI, leave player 1 not set, have the AI do its thing
             if (e.target.getAttribute('id')==='mindless-ai'){
-                console.log("picks mindless ai");
-                players.assignName('mindless AI', players.two);
-                players.two.named = true;
-                playerTwoArea.innerHTML=`<h1 class="name" id="${'X'}">${players.two.name}</h1>`;
-
+                assignAIAttributes('mindless-AI');
+                // console.log("picks mindless ai");
+                // players.assignName('mindless AI', players.two);
+                // players.two.named = true;
+                // players.two.type="AI"
+                // playerTwoArea.innerHTML=`<h1 class="name" id="${'X'}">${players.two.name}</h1>`;
                 //ok now have it do something ie it is moves
+            }
+            else if (e.target.getAttribute('id')==='genius-ai'){
+                assignAIAttributes('genius-AI');
+                // console.log("picks genius ai");
+                // players.assignName('genius AI', players.two);
+                // players.two.named = true;
+                // players.two.type="AI"
+                // playerTwoArea.innerHTML=`<h1 class="name" id="${'X'}">${players.two.name}</h1>`;
             }
             //if agains genius AI, the same but the AI behaves differently
         })
@@ -136,7 +176,7 @@ const gameBoard = (function(){
 
 
     return {
-        fillField,
+        fillClickedField,
         boardArray,
         setUpBoard,
         addNewGameButton,
@@ -146,6 +186,7 @@ const gameBoard = (function(){
         underlineActivePlayer,
         playerOneArea,
         playerTwoArea,
+        fillField,
     }
 
 })();
@@ -247,28 +288,30 @@ const game = (function(){
         return postGame = value
     }
 
-    function checkIfSomeoneWon(){
+    function checkIfSomeoneWon(boardState){//also keeps tally of picked fields
         console.log('checkifsbwonruns')
-        if (!gameBoard.boardArray.includes(null)){
+        if (!boardState.includes(null)){
             endGame(null)
             console.log('runs')
         }
         for (i=0; i<gameBoard.boardArray.length; i++) {
-            if (gameBoard.boardArray[i]==="O"&&!Os.includes(i)){
+            if (boardState[i]==="O"&&!Os.includes(i)){
                 console.log(i)
                 Os.push(i)
             }
-            else if (gameBoard.boardArray[i]==="X"&&!Xes.includes(i)){
+            else if (boardState[i]==="X"&&!Xes.includes(i)){
                 Xes.push(i)
                 console.log(i)
             }
         }
         for (i=0; i<winningCombinations.length;i++){
             if (winningCombinations[i].every(element => Os.includes(element))){
-                endGame(players.one);
+                return players.one
+                //endGame(players.one); moved it to fillField so this can be used for the minmax function
             }
             else if (winningCombinations[i].every(element => Xes.includes(element))){
-                endGame(players.two);
+                return players.two
+                //endGame(players.two);
             }
         }
     }
@@ -319,6 +362,28 @@ const game = (function(){
         setPostGame(false);
         gameBoard.removeNewGameButton();
         gameBoard.underlineActivePlayer();
+        AIPlayerActCheck();
+    }
+
+    function AIPlayerActCheck () {//checks if AI player acts and what type & makes the AI action
+        if (game.currentPlayer===players.two&&players.two.name==="mindless-AI"&&players.two.type==="AI"){
+            let fields = document.getElementsByClassName("field");
+            gameBoard.fillField(fields[Math.floor(Math.random()*9)])
+        }
+
+        else if (game.currentPlayer===players.two&&players.two.name==="genius-AI"&&players.two.type==="AI"){
+            let fields = document.getElementsByClassName("field");
+            let emptyFields = []
+            for (i=0;i<gameBoard.boardArray.length;i++){
+                if (gameBoard.boardArray[i] === null){
+                    emptyFields.push(i)
+                }
+            }
+            //finish genius ai minmax algorithm
+
+
+
+        }
     }
 
     return {
@@ -330,6 +395,8 @@ const game = (function(){
         setPostGame,
         checkIfBoardCanBeCreatedYet,
         startNewGame,
+        AIPlayerActCheck,
+        endGame,
     }
 
 })();
