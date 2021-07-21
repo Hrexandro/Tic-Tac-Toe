@@ -177,6 +177,9 @@ const gameBoard = (function(){
         })
     }
 
+    function getBoardArray(){
+        return boardArray;
+    }
 
     return {
         fillClickedField,
@@ -190,6 +193,7 @@ const gameBoard = (function(){
         playerOneArea,
         playerTwoArea,
         fillField,
+        getBoardArray,
     }
 
 })();
@@ -292,7 +296,7 @@ const game = (function(){
     }
 
     function checkIfSomeoneWon(boardState){//also keeps tally of picked fields
-        console.log('checkifsbwonruns')
+        console.log('check if sb won runs')
         if (!boardState.includes(null)){
             //endGame(null)
             console.log('runs')
@@ -377,28 +381,61 @@ const game = (function(){
 
         else if (game.currentPlayer===players.two&&players.two.name==="genius-AI"&&players.two.type==="AI"){
             let fields = document.getElementsByClassName("field");
-            let emptyFields = []
-            for (i=0;i<gameBoard.boardArray.length;i++){
-                if (gameBoard.boardArray[i] === null){
-                    emptyFields.push(i)
-                }
-            }
-            //finish genius ai minmax algorithm
-            let testBoardState = gameBoard.boardArray;
+            ////////////////////////////////////////////////////////////////////////////VVV  21.07.2021 additions   VVV
+            // let emptyFields = []
+            // for (i=0;i<gameBoard.boardArray.length;i++){
+            //     if (gameBoard.boardArray[i] === null){
+            //         emptyFields.push(i)
+            //     }
+            // }
             
-            function minimax(currentBoardState){
-                let availableFields = emptyFields;
-                if (checkIfSomeoneWon(currentBoardState)===players.one){
-                    return {score: -1};
+            //finish genius ai minmax algorithm
+            let testBoardState = gameBoard.getBoardArray();
+            console.log(`test board state is ${testBoardState}`)
+            
+            function checkCurrentEmptyFields (boardState){
+                let emptyFields = []
+                for (i=0;i<boardState.length;i++){
+                    if (boardState[i] === null){
+                        emptyFields.push(i)
+                    }
                 }
-                else if (checkIfSomeoneWon(currentBoardState)===players.two){
-                    return {score: +1};
+                return emptyFields;
+            }
+            
+            function minimax(currentBoardState, sign){
+                console.log(`test board state is ${testBoardState}`)
+                console.log('mimimax starts')
+                let availableFields = checkCurrentEmptyFields(currentBoardState);
+                console.log(availableFields.length)
+                // if (checkIfSomeoneWon(currentBoardState)===players.one){
+                //     return {score: -1};
+                // }
+                // else if (checkIfSomeoneWon(currentBoardState)===players.two){
+                //     return {score: +1};
+                // }
+                // else if (availableFields.length===0){
+                //     return {score: 0};
+                // }
+                
+                
+                for (i=0;i<availableFields.length;i++){//it changes currentboardstate so it is filled by currentsigns :(((())))
+                    let testedSituation;
+                    console.log(`current board state is ${currentBoardState}`)
+                    console.log(i)
+                    testedSituation = testBoardState;
+                    console.log(testedSituation)
+                    testedSituation[availableFields[i]]=sign;//check this ~~~~~~~~~~~~~~~~~~~~~~~!!!!!!!!!!!
+                    console.log(`current board state is ${currentBoardState}`)
+                    console.log(testedSituation)
+                    console.log(`current board state is ${currentBoardState}`)
+                    //checkIfSomeoneWon(testedSituation)
                 }
-                else if (availableFields.length===0){
-                    return {score: 0};
-                }
+                console.log('it ended')
 
             }
+
+            minimax(testBoardState, players.two.sign)//first minimax invocation
 
 
             // Step 7: First minimax invocation
