@@ -102,6 +102,9 @@ const gameBoard = (function(){
             else if (game.checkIfSomeoneWon(gameBoard.boardArray)===players.two){
                 game.endGame(players.two)
             }
+            else if (game.checkIfSomeoneWon(gameBoard.boardArray)===null){
+                game.endGame(null)
+            }
             
             if (game.getPostGame()===false){
                 game.AIPlayerActCheck();
@@ -291,8 +294,9 @@ const game = (function(){
     function checkIfSomeoneWon(boardState){//also keeps tally of picked fields
         console.log('checkifsbwonruns')
         if (!boardState.includes(null)){
-            endGame(null)
+            //endGame(null)
             console.log('runs')
+            return null;
         }
         for (i=0; i<gameBoard.boardArray.length; i++) {
             if (boardState[i]==="O"&&!Os.includes(i)){
@@ -380,7 +384,43 @@ const game = (function(){
                 }
             }
             //finish genius ai minmax algorithm
+            let testBoardState = gameBoard.boardArray;
+            
+            function minimax(currentBoardState){
+                let availableFields = emptyFields;
+                if (checkIfSomeoneWon(currentBoardState)===players.one){
+                    return {score: -1};
+                }
+                else if (checkIfSomeoneWon(currentBoardState)===players.two){
+                    return {score: +1};
+                }
+                else if (availableFields.length===0){
+                    return {score: 0};
+                }
 
+            }
+
+
+            // Step 7: First minimax invocation
+            // Step 8: Store the indexes of all empty cells
+            // Step 9: Check if there is a terminal state
+            // Step 10: Get ready to test the outcome of playing the current player’s mark on each empty cell
+            // Step 11: Test-play the current player’s mark on the empty cell the for-loop is currently processing
+            // Step 12: Save the latest terminal score
+            // Step 13: Run the active for-loop on the next empty cell
+            // Step 14: Plan how to get the object with the best test-play score for the current player
+            // Step 15: Create a store for the best test-play’s reference
+            // Step 16: Get the reference to the current player’s best test-play
+            // Step 17: Get the object with the best test-play score for the current player
+            // Step 18: Let’s do a review
+            // Step 19: Tracing our steps with a diagram
+            // Step 20: The first for-loop moves forward to process the next empty cell
+            // Step 21: Tracing our steps with a diagram
+            // Step 22: The first for-loop moves forward to process the next empty cell
+            // Step 23: Tracing our steps with a diagram
+            // Step 24: Get the object with the best test-play score for the AI player
+            // Step 25: Use the data inside bestPlayInfo
+            // Step 26: A bird’s-eye view of this tutorial’s algorithm
 
 
         }
