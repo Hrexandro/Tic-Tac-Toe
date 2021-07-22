@@ -420,16 +420,23 @@ const game = (function(){
                 
                 
                 for (i=0;i<availableFields.length;i++){//it changes currentboardstate so it is filled by currentsigns :(((())))
-                    let testedSituation;
-                    console.log(`current board state is ${currentBoardState}`)
-                    console.log(i)
-                    testedSituation = testBoardState;
-                    console.log(testedSituation)
+                    let testedSituation=[];
+                    for(i=0;i<currentBoardState.length;i++){//set up the tested  situation through pushing the board state
+                        console.log(`tested situation is ${testedSituation}`)
+                        console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
+                        testedSituation.push(currentBoardState[i])
+                        console.log(`tested situation is ${testedSituation}`)
+                        console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
+                    }
+                    //console.log(`current board state is ${currentBoardState}`)
+                    //console.log(i)
+                    //testedSituation = testBoardState;
+                    //console.log(testedSituation)
                     testedSituation[availableFields[i]]=sign;//check this ~~~~~~~~~~~~~~~~~~~~~~~!!!!!!!!!!!
-                    console.log(`current board state is ${currentBoardState}`)
-                    console.log(testedSituation)
-                    console.log(`current board state is ${currentBoardState}`)
-                    //checkIfSomeoneWon(testedSituation)
+                    //console.log(`current board state is ${currentBoardState}`)
+                    //console.log(testedSituation)
+                    //console.log(`current board state is ${currentBoardState}`)
+                    checkIfSomeoneWon(testedSituation)
                 }
                 console.log('it ended')
 
