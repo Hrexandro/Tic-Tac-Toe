@@ -408,6 +408,7 @@ const game = (function(){
                 console.log('mimimax starts')
                 let availableFields = checkCurrentEmptyFields(currentBoardState);
                 console.log(availableFields.length)
+                console.log(`availableFields is ${availableFields}`)
                 // if (checkIfSomeoneWon(currentBoardState)===players.one){
                 //     return {score: -1};
                 // }
@@ -420,23 +421,28 @@ const game = (function(){
                 
                 
                 for (i=0;i<availableFields.length;i++){//it changes currentboardstate so it is filled by currentsigns :(((())))
+                    console.log(`availableFields.length is ${availableFields.length}`)
                     let testedSituation=[];
-                    for(i=0;i<currentBoardState.length;i++){//set up the tested  situation through pushing the board state
-                        console.log(`tested situation is ${testedSituation}`)
-                        console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
-                        testedSituation.push(currentBoardState[i])
-                        console.log(`tested situation is ${testedSituation}`)
-                        console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
+                    for(j=0;j<currentBoardState.length;j++){//set up the tested  situation through pushing the board state
+                        //console.log(`tested situation is ${testedSituation}`)
+                        //console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
+                        testedSituation.push(currentBoardState[j])
+                        //console.log(`tested situation is ${testedSituation}`)
+                        //console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
                     }
                     //console.log(`current board state is ${currentBoardState}`)
                     //console.log(i)
                     //testedSituation = testBoardState;
                     //console.log(testedSituation)
                     testedSituation[availableFields[i]]=sign;//check this ~~~~~~~~~~~~~~~~~~~~~~~!!!!!!!!!!!
-                    //console.log(`current board state is ${currentBoardState}`)
-                    //console.log(testedSituation)
+                    console.log(`[i] is ${i}`)
+                    console.log(`availableFields$[${i}] is ${availableFields[i]}`)
+                    console.log(`testedSituation[availableFields[i]] is ${testedSituation[availableFields[i]]}`)
+                    console.log(`current board state is ${currentBoardState}`)
+                    console.log(`tested situation is ${testedSituation}`)
                     //console.log(`current board state is ${currentBoardState}`)
                     checkIfSomeoneWon(testedSituation)
+                    console.log(`availableFields.length is ${availableFields.length}`)
                 }
                 console.log('it ended')
 
