@@ -299,7 +299,7 @@ const game = (function(){
         console.log('check if sb won runs')
         if (!boardState.includes(null)){
             //endGame(null)
-            console.log('runs')
+            console.log('no one wins')
             return null;
         }
         for (i=0; i<gameBoard.boardArray.length; i++) {
@@ -402,8 +402,10 @@ const game = (function(){
                 }
                 return emptyFields;
             }
-            
+            let allTestedPlays = [];
+            let minimaxCounter=0; //after finishing game reset this counter
             function minimax(currentBoardState, sign){
+
                 console.log('mimimax starts')
                 console.log(`sign is ${sign}`)
                 console.log(`test board state is ${testBoardState}`)
@@ -434,21 +436,26 @@ const game = (function(){
                 // }
                 
                 console.log(`before simulation loop sign is ${sign}`)
-                for (k=0;k<availableFields.length;k++){//it changes currentboardstate so it is filled by currentsigns :(((())))
+                for (k=0;k<availableFields.length;k++){// CHECKS ALL THE AVAILABLE FIELDS TO PUT IN THE SIGN///////////////////////////////////////////////////////////////
+                    console.log(`k is ${k}`)//WHY IS K ZERO ALL THE TIMEEEEEEE
                     console.log(`availableFields.length is ${availableFields.length}`)
                     let testedSituation=[];
-                    for(j=0;j<currentBoardState.length;j++){//set up the tested  situation through pushing the board state
+                    for(j=0;j<currentBoardState.length;j++){//set up the tested situation through pushing the board state
                         //console.log(`tested situation is ${testedSituation}`)
                         //console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
-                        testedSituation.push(currentBoardState[j])
+                        testedSituation.push(currentBoardState[j])  //puts the current board state in the tested situation array, the current board state is the parameter of the minimax func
                         //console.log(`tested situation is ${testedSituation}`)
                         //console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
                     }
+                    
                     //console.log(`current board state is ${currentBoardState}`)
                     //console.log(i)
                     //testedSituation = testBoardState;
                     //console.log(testedSituation)
-                    testedSituation[availableFields[k]]=sign;//check this ~~~~~~~~~~~~~~~~~~~~~~~!!!!!!!!!!!
+                    testedSituation[availableFields[k]]=sign;// TESTS THE SITUATION///////////////////////////////////////////////////////////////
+                    allTestedPlays.push([sign, k])
+                    console.log(`k is ${k}`)
+                    console.log(`allTestedPlays is ${allTestedPlays}`)
                     console.log(`sign is ${sign}`)
                     // console.log(`[k] is ${k}`)
                     // console.log(`availableFields$[${k}] is ${availableFields[k]}`)
@@ -457,7 +464,7 @@ const game = (function(){
                      console.log(`tested situation is ${testedSituation}`)
                     //console.log(`current board state is ${currentBoardState}`)
                     console.log(`sign before check if sbwon is ${sign}`)
-                    checkIfSomeoneWon(testedSituation)
+                    checkIfSomeoneWon(testedSituation)//CHECKS IF SOMEONE WINS IN THIS SITUATOON///////////////////////////////////////////////////////////////
                     console.log(`sign after check if sbwon is ${sign}`)
 ///////////////////////////////////////////////////////////////
                     scoreTest(testedSituation)
@@ -473,6 +480,7 @@ const game = (function(){
                         minimax(testedSituation, players.two.sign)
                     }
                     console.log('it ended')
+                    
                 }
 //////// we continue ////"sign is undefined"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
