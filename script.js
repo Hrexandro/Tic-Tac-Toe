@@ -405,35 +405,29 @@ const game = (function(){
             let allTestedPlays = [];
             let minimaxCounter=0; //after finishing game reset this counter
             function minimax(currentBoardState, sign){
+                console.log('minimax starts')
+                let availableFields = checkCurrentEmptyFields(currentBoardState);
+                console.log(`availableFields/lenght is ${availableFields.length}`)
+                console.log(`availableFields is ${availableFields}`)
+
+                //it rather makes sense to test at the beginning, ok
+                if (checkIfSomeoneWon(currentBoardState)===players.one){
+                    return {score: -1};
+                }
+                else if (checkIfSomeoneWon(currentBoardState)===players.two){
+                    return {score: +1};
+                }
+                else if (checkIfSomeoneWon(currentBoardState)===null){
+                    return {score: 0};
+                }
+                // else if (availableFields.length===0){
+                //     return {score: 0};
+                // }
 
                 console.log('mimimax starts')
                 console.log(`sign is ${sign}`)
                 console.log(`test board state is ${testBoardState}`)
 
-                let availableFields = checkCurrentEmptyFields(currentBoardState);
-                console.log(availableFields.length)
-                console.log(`availableFields is ${availableFields}`)
-
-                function scoreTest (situation){
-                    if (checkIfSomeoneWon(situation)===players.one){
-                        return {score: -1};
-                    }
-                    else if (checkIfSomeoneWon(situation)===players.two){
-                        return {score: +1};
-                    }
-                    else if (availableFields.length===0){
-                        return {score: 0};
-                    }
-                }
-                // if (checkIfSomeoneWon(currentBoardState)===players.one){
-                //     return {score: -1};
-                // }
-                // else if (checkIfSomeoneWon(currentBoardState)===players.two){
-                //     return {score: +1};
-                // }
-                // else if (availableFields.length===0){
-                //     return {score: 0};
-                // }
                 
                 console.log(`before simulation loop sign is ${sign}`)
                 for (k=0;k<availableFields.length;k++){// CHECKS ALL THE AVAILABLE FIELDS TO PUT IN THE SIGN///////////////////////////////////////////////////////////////
@@ -447,39 +441,58 @@ const game = (function(){
                         //console.log(`tested situation is ${testedSituation}`)
                         //console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
                     }
-                    
+                    let currentTestedPlay={};
+                    currentTestedPlay.index=availableFields[k];
+                    console.log(`currentTestedPlay is ${console.log(JSON.stringify(currentTestedPlay))}`)
+                    console.log(`currentTestedPlay.score is ${console.log(JSON.stringify(currentTestedPlay.score))}`)
                     //console.log(`current board state is ${currentBoardState}`)
                     //console.log(i)
                     //testedSituation = testBoardState;
                     //console.log(testedSituation)
                     testedSituation[availableFields[k]]=sign;// TESTS THE SITUATION///////////////////////////////////////////////////////////////
-                    allTestedPlays.push([sign, k])
-                    console.log(`k is ${k}`)
-                    console.log(`allTestedPlays is ${allTestedPlays}`)
-                    console.log(`sign is ${sign}`)
+                    //console.log(`[sign, k] is ${[sign, k]}`)
+                    //allTestedPlays.push([sign, k])//does not work because k keeps being 0
+                    //console.log(`k is ${k}`)
+                    //console.log(`allTestedPlays is ${allTestedPlays}`)
+                    //console.log(`sign is ${sign}`)
                     // console.log(`[k] is ${k}`)
                     // console.log(`availableFields$[${k}] is ${availableFields[k]}`)
                     // console.log(`testedSituation[availableFields[k]] is ${testedSituation[availableFields[k]]}`)
-                     console.log(`current board state is ${currentBoardState}`)
-                     console.log(`tested situation is ${testedSituation}`)
+                     //console.log(`current board state is ${currentBoardState}`)
+                     //console.log(`tested situation is ${testedSituation}`)
                     //console.log(`current board state is ${currentBoardState}`)
-                    console.log(`sign before check if sbwon is ${sign}`)
-                    checkIfSomeoneWon(testedSituation)//CHECKS IF SOMEONE WINS IN THIS SITUATOON///////////////////////////////////////////////////////////////
-                    console.log(`sign after check if sbwon is ${sign}`)
+                    //console.log(`sign before check if sbwon is ${sign}`)
+
+                   
+
+                    //checkIfSomeoneWon(testedSituation)//CHECKS IF SOMEONE WINS IN THIS SITUATOON///////////////////////////////////////////////////////////////
+                    //console.log(`sign after check if sbwon is ${sign}`)
 ///////////////////////////////////////////////////////////////
-                    scoreTest(testedSituation)
+                    //scoreTest(testedSituation)
+
 ///////////////////////////////////////////////////////////////
                     // console.log(`availableFields.length is ${availableFields.length}`)
                     // console.log(`[k] is ${k}`)
                     console.log(`sign is ${sign}`)
-                    console.log(`tested situation is ${testedSituation}`)
+                    // console.log(`tested situation is ${testedSituation}`)
                     if (sign===players.two.sign){
-                        minimax(testedSituation, players.one.sign)
+                       let result = minimax(testedSituation, players.one.sign);
+                       currentTestedPlay.score=result.score;
                     }
                     else if (sign===players.one.sign){
-                        minimax(testedSituation, players.two.sign)
+                        let result = minimax(testedSituation, players.two.sign);
+                        currentTestedPlay.score=result.score;
                     }
-                    console.log('it ended')
+                     console.log('START OF POST RECURRENTIAL MINIMAX')
+                    // console.log(`[sign, k] is ${[sign, k]}`)
+                    // allTestedPlays.push([sign, k])//does not work because k keeps being 0
+                    // console.log(`k is ${k}`)
+                    // console.log(`allTestedPlays is ${allTestedPlays}`)
+                    // console.log('it ended')
+                    // console.log(`k is ${k}`) 
+                    // console.log(`allTestedPlays is ${allTestedPlays}`)
+                    // console.log('END  OF POST RECURRENTIAL MINIMAX')
+                    allTestedPlays.push(currentTestedPlay);//is this the right place?
                     
                 }
 //////// we continue ////"sign is undefined"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -529,6 +542,7 @@ const game = (function(){
         startNewGame,
         AIPlayerActCheck,
         endGame,
+        
     }
 
 })();
