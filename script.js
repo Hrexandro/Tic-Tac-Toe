@@ -7,6 +7,9 @@ TO DO:
 -add choosing single or multiplayer
 -program the AI
 
+- animate symbols appearing
+- highlight successful combination
+
 
 - at start both name pickers should be hidden (add a hidden class that then gets removed)
 - after picking button they should become visible (only one if against AI - otherwise the computer name is appear)
@@ -51,6 +54,13 @@ const gameBoard = (function(){
             game.startNewGame();
         })
     }
+
+    function highlightFields(fieldsArray){//make sure this works, needs to get the array of DOM elements
+        for (i=0;i<fieldsArray.length;i++){
+            fieldsArray[i].classList.add('winning-combination')
+        }
+        console.log("highlight fields finishes")
+    } 
 
     function removeNewGameButton(){
         centerColumnElement.removeChild(document.getElementById("new-game-button"));
@@ -124,6 +134,7 @@ const gameBoard = (function(){
     function clearGameBoard(){
         Array.from(document.getElementsByClassName('field')).forEach((element)=>{
             element.innerText = "";
+            element.classList.remove("winning-combination");
         })
     }
 
@@ -194,6 +205,7 @@ const gameBoard = (function(){
         playerTwoArea,
         fillField,
         getBoardArray,
+        highlightFields,
     }
 
 })();
@@ -313,11 +325,29 @@ const game = (function(){
             }
         }
         for (i=0; i<winningCombinations.length;i++){
-            if (winningCombinations[i].every(element => Os.includes(element))){
+            let fieldsToHighlight = [];
+            // if (winningCombinations[i].every(element => Os.includes(element))||winningCombinations[i].every(element => Xes.includes(element))){
+            //     console.log("now is the combo");
+            //     console.log(winningCombinations[i]);
+            
+            //     let fieldsToHighlight = [];
+            //     winningCombinations[i].forEach(element => fieldsToHighlight.push(document.getElementById(element)));
+            //     console.log(fieldsToHighlight);
+            //     gameBoard.highlightFields(fieldsToHighlight);
+            //     //highlightFields(array)
+            // };
+            if (winningCombinations[i].every(element => Os.includes(element))){//condense this code later into a single function because code is repeated
+                console.log("it says the thing now")
+                console.log(winningCombinations[i].every(element => Os.includes(element)))
+                winningCombinations[i].forEach(element => fieldsToHighlight.push(document.getElementById(element)));
+                gameBoard.highlightFields(fieldsToHighlight)
+                //extract the numbers that make the winning combination
                 return players.one
                 //endGame(players.one); moved it to fillField so this can be used for the minmax function
             }
             else if (winningCombinations[i].every(element => Xes.includes(element))){
+                winningCombinations[i].forEach(element => fieldsToHighlight.push(document.getElementById(element)));
+                gameBoard.highlightFields(fieldsToHighlight)
                 return players.two
                 //endGame(players.two);
             }
@@ -417,6 +447,7 @@ const game = (function(){
                 console.log(checkIfSomeoneWon(currentBoardState)===players.two)
                 console.log(checkIfSomeoneWon(currentBoardState)===null)
                 console.log('starts actually checking')
+
                 if (checkIfSomeoneWon(currentBoardState)===players.one){
                     console.log('returns {score: -1}')
                     return {score: -1};
@@ -448,7 +479,7 @@ const game = (function(){
                 
                 console.log(`before simulation loop sign is ${sign}`)
                 for (k=0;k<availableFields.length;k++){// CHECKS ALL THE AVAILABLE FIELDS TO PUT IN THE SIGN///////////////////////////////////////////////////////////////
-                    console.log(`k is ${k}`)//WHY IS K ZERO ALL THE TIMEEEEEEE
+                    console.log(`k is ${k}`)//WHY IS K ZERO ALL THE TIMEEEEEEE - it is 0 because it does not update until the whole recurrent function unravels
                     console.log(`availableFields is ${availableFields}`)
                     console.log(`availableFields.length is ${availableFields.length}`)
                     let testedSituation=[];

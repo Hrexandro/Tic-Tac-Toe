@@ -20,6 +20,10 @@ h1{
     margin:0;
 }
 
+.winning-combination{
+    color: red;
+}
+
 .hidden{
     visibility:hidden;
 }
