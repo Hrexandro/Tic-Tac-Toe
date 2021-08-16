@@ -571,9 +571,15 @@ const game = (function(){
 
 //z jakimi parametrami nalezy kolejyn minimax zrobic czy w testowanej sytuacji? kurde chyba tak! a score test?
 
-
-
-            }
+                
+                console.log("TEST THIS TO CHECK IF FILL FIELD")
+                console.log(allTestedPlays)
+                console.log(allTestedPlays[0].score)
+                console.log((allTestedPlays.reduce((highest,checked)=>{return Math.max(checked.score,highest)},0)))
+                console.log(`DOM element to be filled is ${document.getElementById(String(allTestedPlays.reduce((highest,checked)=>{return Math.max(checked.score,highest)},0).index))}`)
+                //gameBoard.fillField(document.getElementById(allTestedPlays.reduce((a,b)=>{return Math.max(a.score,b.score)},0).index))//?????
+                return {score: 0};
+            }//the problem is apparently because it does not return anything in the end, cheking returning of whatever
             console.log("before first minimax invoaction")
             minimax(testBoardState, players.two.sign)//first minimax invocation
             console.log("after first minimax invoaction")
