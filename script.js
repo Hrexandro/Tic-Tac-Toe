@@ -8,7 +8,7 @@ TO DO:
 -program the AI
 
 - animate symbols appearing
-- highlight successful combination
+- check if sb won also udates the board, finishing the game even in minimax simulation mode
 
 
 - at start both name pickers should be hidden (add a hidden class that then gets removed)
@@ -433,20 +433,10 @@ const game = (function(){
                 }
                 return emptyFields;
             }
-            let allTestedPlays = [];
-            let minimaxCounter=0; //after finishing game reset this counter
+            
+            
+            
             function minimax(currentBoardState, sign){
-                console.log('minimax starts')
-                //it rather makes sense to test at the beginning, ok
-                console.log("starts checking if someone won + scoring")
-                console.log(`checkIfSomeoneWon(currentBoardState) is ${JSON.stringify(checkIfSomeoneWon(currentBoardState))}`)
-                console.log(`players.one is ${JSON.stringify(players.one)}`)
-                console.log(`players.two is ${JSON.stringify(players.two)}`)
-                console.log(`checkIfSomeoneWon(currentBoardState) is ${JSON.stringify(checkIfSomeoneWon(currentBoardState))}`)
-                console.log(checkIfSomeoneWon(currentBoardState)===players.one)
-                console.log(checkIfSomeoneWon(currentBoardState)===players.two)
-                console.log(checkIfSomeoneWon(currentBoardState)===null)
-                console.log('starts actually checking')
 
                 if (checkIfSomeoneWon(currentBoardState)===players.one){
                     console.log('returns {score: -1}')
@@ -461,149 +451,79 @@ const game = (function(){
                     return {score: 0};
                 }
 
-
                 let availableFields = checkCurrentEmptyFields(currentBoardState);
-                console.log(`availableFields/lenght is ${availableFields.length}`)
-                console.log(`availableFields is ${availableFields}`)
-
+                const allTestedPlays = [];
                 
-
-                // else if (availableFields.length===0){
-                //     return {score: 0};
-                // }
-
-                console.log('mimimax starts')
-                console.log(`sign is ${sign}`)
-                console.log(`test board state is ${testBoardState}`)
-
-                
-                console.log(`before simulation loop sign is ${sign}`)
                 for (k=0;k<availableFields.length;k++){// CHECKS ALL THE AVAILABLE FIELDS TO PUT IN THE SIGN///////////////////////////////////////////////////////////////
-                    console.log(`k is ${k}`)//WHY IS K ZERO ALL THE TIMEEEEEEE - it is 0 because it does not update until the whole recurrent function unravels
-                    console.log(`availableFields is ${availableFields}`)
-                    console.log(`availableFields.length is ${availableFields.length}`)
+
                     let testedSituation=[];
                     for(j=0;j<currentBoardState.length;j++){//set up the tested situation through pushing the board state
-                        //console.log(`tested situation is ${testedSituation}`)
-                        //console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
                         testedSituation.push(currentBoardState[j])  //puts the current board state in the tested situation array, the current board state is the parameter of the minimax func
-                        //console.log(`tested situation is ${testedSituation}`)
-                        //console.log(`currentBoardState${i} is ${currentBoardState[i]}`)
                     }
                     let currentTestedPlay={};
-                    currentTestedPlay.index=availableFields[k];
-                    console.log(`currentTestedPlay is ${JSON.stringify(currentTestedPlay)}`)
-                    //console.log(`currentTestedPlay.score is ${console.log(JSON.stringify(currentTestedPlay.score))}`)
-                    //console.log(`current board state is ${currentBoardState}`)
-                    //console.log(i)
-                    //testedSituation = testBoardState;
-                    //console.log(testedSituation)
+                    currentTestedPlay.index=availableFields[k];//save the index of the currently processed field
+
                     testedSituation[availableFields[k]]=sign;// TESTS THE SITUATION///////////////////////////////////////////////////////////////
-                    //console.log(`[sign, k] is ${[sign, k]}`)
-                    //allTestedPlays.push([sign, k])//does not work because k keeps being 0
-                    //console.log(`k is ${k}`)
-                    //console.log(`allTestedPlays is ${allTestedPlays}`)
-                    //console.log(`sign is ${sign}`)
-                    // console.log(`[k] is ${k}`)
-                    // console.log(`availableFields$[${k}] is ${availableFields[k]}`)
-                    // console.log(`testedSituation[availableFields[k]] is ${testedSituation[availableFields[k]]}`)
-                     //console.log(`current board state is ${currentBoardState}`)
-                     //console.log(`tested situation is ${testedSituation}`)
-                    //console.log(`current board state is ${currentBoardState}`)
-                    //console.log(`sign before check if sbwon is ${sign}`)
+ 
 
-                   
-
-                    //checkIfSomeoneWon(testedSituation)//CHECKS IF SOMEONE WINS IN THIS SITUATOON///////////////////////////////////////////////////////////////
-                    //console.log(`sign after check if sbwon is ${sign}`)
-///////////////////////////////////////////////////////////////
-                    //scoreTest(testedSituation)
-
-///////////////////////////////////////////////////////////////
-                    // console.log(`availableFields.length is ${availableFields.length}`)
-                    // console.log(`[k] is ${k}`)
-                    console.log(`sign is ${sign}`)
-                    // console.log(`tested situation is ${testedSituation}`)
-                    console.log(`before recurrence sorting`)
-                    ///////////////////////////////////////////////////////////////THIS IS WHERE IT BREAKS, RESULT IS UNDEFINED FOR SOME REASON
-                    ////////////////////////////CHECK OUT WHAT HAPPENS AFTER returns {score: 0}
-                    ////////////////////////////CHECK OUT THE ORDER, PERHAPS THE ALLTESTEDPLAYS.PUSH MUST BE MOVED SOMETHWARE DAMNIT
                     if (sign===players.two.sign){
-                        console.log("recurrence sorting === players.two")
+
                        const result = minimax(testedSituation, players.one.sign);
-                       console.log(`result is ${JSON.stringify(result)}`)
-                       console.log("postrecurrence sorting === players.two")
-                       console.log("recurrence sorting post mimimax")
-                       console.log(`result is ${JSON.stringify(result)}`)
+
                        currentTestedPlay.score=result.score;
                     }
                     else if (sign===players.one.sign){
-                        console.log("recurrence sorting === players.one")
+
         
                         const result = minimax(testedSituation, players.two.sign);
-                        console.log("postrecurrence sorting === players.one")
-                        console.log("recurrence sorting post mimimax")
-                        console.log(`result is ${JSON.stringify(result)}`)
+
                         currentTestedPlay.score=result.score;
                     }
-                    ///////////////////////////////////////////////////////////////
-                     console.log('START OF POST RECURRENTIAL MINIMAX')
-                     console.log(`k is ${k}`)
-                    // console.log(`[sign, k] is ${[sign, k]}`)
-                    // allTestedPlays.push([sign, k])//does not work because k keeps being 0
-                    // console.log(`k is ${k}`)
-                    // console.log(`allTestedPlays is ${allTestedPlays}`)
-                    // console.log('it ended')
-                    // console.log(`k is ${k}`) 
-                    // console.log(`allTestedPlays is ${allTestedPlays}`)
-                    // console.log('END  OF POST RECURRENTIAL MINIMAX')
-                    console.log(`allTestedPlays is ${JSON.stringify(allTestedPlays)}`)
-                    console.log(`currentTestedPlay is ${JSON.stringify(currentTestedPlay)}`)
-                    allTestedPlays.push(currentTestedPlay);//is this the right place?
-                    console.log('after pushing current tested plays into alltestedplayss')
-                    console.log(`allTestedPlays is ${JSON.stringify(allTestedPlays)}`)
-                    console.log(`currentTestedPlay is ${JSON.stringify(currentTestedPlay)}`)
-                    console.log(`k is ${k}`)
+
+                    testedSituation[availableFields[k]]=null// CLEAR THE CURRENTLY WORKED FIELD OF THE SYMBOL
+                    allTestedPlays.push(currentTestedPlay)
+
                 }
+                console.log(`allTestedPlays is ${JSON.stringify(allTestedPlays)}`)
                 
-                console.log("after the loop that is supposed to check all possible field entreis")
-//////// we continue ////"sign is undefined"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                let bestPlay = null/////////////////////////////////////////////////////////////
 
-//z jakimi parametrami nalezy kolejyn minimax zrobic czy w testowanej sytuacji? kurde chyba tak! a score test?
+                if (sign===players.two.sign){//get the best play for the current player
 
-                
-                console.log("TEST THIS TO CHECK IF FILL FIELD")
-                console.log(allTestedPlays)
-                console.log(allTestedPlays[0].score)
-                console.log((allTestedPlays.reduce((highest,checked)=>{return Math.max(checked.score,highest)},0)))
-                console.log(`DOM element to be filled is ${document.getElementById(String(allTestedPlays.reduce((highest,checked)=>{return Math.max(checked.score,highest)},0).index))}`)
-                //gameBoard.fillField(document.getElementById(allTestedPlays.reduce((a,b)=>{return Math.max(a.score,b.score)},0).index))//?????
-                return {score: 0};//has to return SOMETHING
+                    let bestScore = -Infinity;
+
+                    for (l=0;l<allTestedPlays.length;l++){
+                        if (allTestedPlays[l].score>bestScore){
+                            bestScore = allTestedPlays[l].score
+                            bestPlay = l
+                        }
+                    }
+
+                }
+                else if (sign===players.one.sign){
+
+                    let bestScore = Infinity;
+
+                    for (l=0;l<allTestedPlays.length;l++){
+                        if (allTestedPlays[l].score<bestScore){
+                            bestScore = allTestedPlays[l].score
+                            bestPlay = l
+                        }
+                    }
+                }
+                return allTestedPlays[bestPlay];//has to return SOMETHING, returns the best play - then you'll have to mark the proper field index based on the returned play
             }//the problem is apparently because it does not return anything in the end, cheking returning of whatever
             console.log("before first minimax invoaction")
-            minimax(testBoardState, players.two.sign)//first minimax invocation
+            let bestFieldToPlay=minimax(testBoardState, players.two.sign)//first minimax invocation
             console.log("after first minimax invoaction")
+            console.log(JSON.stringify(bestFieldToPlay));
+            console.log(bestFieldToPlay);
+            console.log(bestFieldToPlay.index);
+            console.log(fields)
+            
+            console.log(JSON.stringify(bestFieldToPlay));
+            //gameBoard.fillField(fields[bestFieldToPlay.index]);
 
-            // Step 7: First minimax invocation
-            // Step 8: Store the indexes of all empty cells
-            // Step 9: Check if there is a terminal state
-            // Step 10: Get ready to test the outcome of playing the current player’s mark on each empty cell
-            // Step 11: Test-play the current player’s mark on the empty cell the for-loop is currently processing
-            // Step 12: Save the latest terminal score
-            // Step 13: Run the active for-loop on the next empty cell
-            // Step 14: Plan how to get the object with the best test-play score for the current player
-            // Step 15: Create a store for the best test-play’s reference
-            // Step 16: Get the reference to the current player’s best test-play
-            // Step 17: Get the object with the best test-play score for the current player
-            // Step 18: Let’s do a review
-            // Step 19: Tracing our steps with a diagram
-            // Step 20: The first for-loop moves forward to process the next empty cell
-            // Step 21: Tracing our steps with a diagram
-            // Step 22: The first for-loop moves forward to process the next empty cell
-            // Step 23: Tracing our steps with a diagram
-            // Step 24: Get the object with the best test-play score for the AI player
-            // Step 25: Use the data inside bestPlayInfo
-            // Step 26: A bird’s-eye view of this tutorial’s algorithm
 
 
         }
