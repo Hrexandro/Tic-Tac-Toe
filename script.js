@@ -412,15 +412,7 @@ const game = (function(){
         else if (game.currentPlayer===players.two&&players.two.name==="genius-AI"&&players.two.type==="AI"){
             console.log("genius ai starts acting")
             let fields = document.getElementsByClassName("field");
-            ////////////////////////////////////////////////////////////////////////////VVV  21.07.2021 additions   VVV
-            // let emptyFields = []
-            // for (i=0;i<gameBoard.boardArray.length;i++){
-            //     if (gameBoard.boardArray[i] === null){
-            //         emptyFields.push(i)
-            //     }
-            // }
-            
-            //finish genius ai minmax algorithm
+
             let testBoardState = gameBoard.getBoardArray();
             console.log(`test board state is ${testBoardState}`)
             
@@ -433,8 +425,6 @@ const game = (function(){
                 }
                 return emptyFields;
             }
-            
-            
             
             function minimax(currentBoardState, sign){
 
@@ -455,55 +445,39 @@ const game = (function(){
                 const allTestedPlays = [];
                 
                 for (k=0;k<availableFields.length;k++){// CHECKS ALL THE AVAILABLE FIELDS TO PUT IN THE SIGN///////////////////////////////////////////////////////////////
-
                     let testedSituation=[];
                     for(j=0;j<currentBoardState.length;j++){//set up the tested situation through pushing the board state
                         testedSituation.push(currentBoardState[j])  //puts the current board state in the tested situation array, the current board state is the parameter of the minimax func
                     }
                     let currentTestedPlay={};
                     currentTestedPlay.index=availableFields[k];//save the index of the currently processed field
-
                     testedSituation[availableFields[k]]=sign;// TESTS THE SITUATION///////////////////////////////////////////////////////////////
- 
 
                     if (sign===players.two.sign){
-
                        const result = minimax(testedSituation, players.one.sign);
-
                        currentTestedPlay.score=result.score;
                     }
                     else if (sign===players.one.sign){
-
-        
                         const result = minimax(testedSituation, players.two.sign);
-
                         currentTestedPlay.score=result.score;
                     }
-
                     testedSituation[availableFields[k]]=null// CLEAR THE CURRENTLY WORKED FIELD OF THE SYMBOL
                     allTestedPlays.push(currentTestedPlay)
-
                 }
                 console.log(`allTestedPlays is ${JSON.stringify(allTestedPlays)}`)
                 
                 let bestPlay = null/////////////////////////////////////////////////////////////
-
                 if (sign===players.two.sign){//get the best play for the current player
-
                     let bestScore = -Infinity;
-
                     for (l=0;l<allTestedPlays.length;l++){
                         if (allTestedPlays[l].score>bestScore){
                             bestScore = allTestedPlays[l].score
                             bestPlay = l
                         }
                     }
-
                 }
                 else if (sign===players.one.sign){
-
                     let bestScore = Infinity;
-
                     for (l=0;l<allTestedPlays.length;l++){
                         if (allTestedPlays[l].score<bestScore){
                             bestScore = allTestedPlays[l].score
