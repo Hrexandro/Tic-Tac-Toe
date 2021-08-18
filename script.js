@@ -578,7 +578,7 @@ const game = (function(){
                 console.log((allTestedPlays.reduce((highest,checked)=>{return Math.max(checked.score,highest)},0)))
                 console.log(`DOM element to be filled is ${document.getElementById(String(allTestedPlays.reduce((highest,checked)=>{return Math.max(checked.score,highest)},0).index))}`)
                 //gameBoard.fillField(document.getElementById(allTestedPlays.reduce((a,b)=>{return Math.max(a.score,b.score)},0).index))//?????
-                return {score: 0};
+                return {score: 0};//has to return SOMETHING
             }//the problem is apparently because it does not return anything in the end, cheking returning of whatever
             console.log("before first minimax invoaction")
             minimax(testBoardState, players.two.sign)//first minimax invocation
