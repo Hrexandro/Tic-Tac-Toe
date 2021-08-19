@@ -2,6 +2,14 @@
 
 TO DO:
 
+
+note 19.08.2021
+-fixed the bug that cause boardArray to be filled when running the minimax simulation, it was because I tried using currentBoardState throughout, instead of substituting it with testBoardState in
+each run, NOT SURE why this is the case however
+- allTestedPlays still is reset and holds only one value with each recurrence if inside the minimax function
+- regardless of the position of allTestedPlace, the AI still fills the first available field, regardless whether it's a good idea or not
+
+
 - display who has which symbol
 - make it look better
 -add choosing single or multiplayer
@@ -9,6 +17,9 @@ TO DO:
 
 - animate symbols appearing
 - check if sb won also udates the board, finishing the game even in minimax simulation mode
+
+
+
 
 
 - at start both name pickers should be hidden (add a hidden class that then gets removed)
@@ -28,7 +39,18 @@ const gameBoard = (function(){
         }
     }
     clearBoardArray();
-    console.log(boardArray);
+    console.log(`boardArray at start is ${boardArray}`);
+
+    function changeBoardArrayElement(ordinal, symbol){
+        console.log("changeBoardArray Element Runs")
+        console.log(`boardArray before change is ${boardArray}`);
+        boardArray[ordinal]=symbol;
+        console.log(`boardArray after change is ${boardArray}`);
+    }
+
+    function getBoardArrayLength(){
+        return boardArray.length;
+    }
 
     //display the gameBoard on the screen
     let gameBoardElement = document.getElementById('game-board');
@@ -103,16 +125,17 @@ const gameBoard = (function(){
             console.log(game.currentPlayer)
             console.log(players.one)
             field.innerText = `${game.currentPlayer.sign}`;
-            boardArray[field.getAttribute('id')] = game.currentPlayer.sign;
+            changeBoardArrayElement(field.getAttribute('id'),game.currentPlayer.sign);
+            //boardArray[field.getAttribute('id')] = game.currentPlayer.sign;
             (game.currentPlayer===players.one)? game.currentPlayer=players.two : game.currentPlayer=players.one;  
             underlineActivePlayer();///////////////////
-            if(game.checkIfSomeoneWon(gameBoard.boardArray)===players.one){
+            if(game.checkIfSomeoneWon(gameBoard.getBoardArray())===players.one){
                 game.endGame(players.one)
             }
-            else if (game.checkIfSomeoneWon(gameBoard.boardArray)===players.two){
+            else if (game.checkIfSomeoneWon(gameBoard.getBoardArray())===players.two){
                 game.endGame(players.two)
             }
-            else if (game.checkIfSomeoneWon(gameBoard.boardArray)===null){
+            else if (game.checkIfSomeoneWon(gameBoard.getBoardArray())===null){
                 game.endGame(null)
             }
             
@@ -189,12 +212,17 @@ const gameBoard = (function(){
     }
 
     function getBoardArray(){
+        console.log("getboardarray runs");
+        console.log(`boardArray when getting is ${boardArray}`)
         return boardArray;
+        
     }
 
     return {
         fillClickedField,
-        boardArray,
+        //boardArray, //restrict access because something is fucking it up
+        //changeBoardArrayElement, //only used inside gameBoard module apparently
+        getBoardArrayLength,
         setUpBoard,
         addNewGameButton,
         clearGameBoard,
@@ -284,7 +312,9 @@ const players = (function(){
 })();
 
 const game = (function(){
+    
     let testing = false;
+    console.log(`testing after starting game is ${testing}`)
     let currentPlayer=players.one;
 
     let postGame = false; //after the game, you should not be able to fill more fields
@@ -310,41 +340,64 @@ const game = (function(){
     function checkIfSomeoneWon(boardState){//also keeps tally of picked fields
         let Xes = [];//those were outside of the function before, I am trying to change it to enable using it in the minimax function
         let Os = [];//without having to worry about it ending the actual game
+        //console.log(`boardArray at start of checkIfSomeoneWon ${gameBoard.boardArray}`)
         console.log('check if sb won runs')
+        console.log(`teesting is ${testing}`)
         if (!boardState.includes(null)){
             //endGame(null)
             console.log('no one wins')
             return null;
+
         }
-        for (i=0; i<gameBoard.boardArray.length; i++) {
+        //console.log(`boardArray before loop pushing xes and os is ${gameBoard.boardArray}`)
+        for (i=0; i<gameBoard.getBoardArrayLength(); i++) {
             if (boardState[i]==="O"&&!Os.includes(i)){
-                console.log(i)
-                Os.push(i)
+                //console.log(i)
+                console.log(`Os is ${Os}`);
+                Os.push(i);
+                console.log(`Os is ${Os}`);
             }
             else if (boardState[i]==="X"&&!Xes.includes(i)){
-                Xes.push(i)
-                console.log(i)
+                console.log(`Xes is ${Xes}`);
+                Xes.push(i);
+                console.log(`Xes is ${Xes}`);
+                //console.log(i)
             }
         }
-        if (!testing){
-            console.log("HIGHLIGHTS THE FIELDS ON THE SCREEN")
-            for (i=0; i<winningCombinations.length;i++){//highlight fields
-                let fieldsToHighlight = [];     
-                if (winningCombinations[i].every(element => Os.includes(element))){//condense this code later into a single function because code is repeated
-                    
-                    console.log(winningCombinations[i].every(element => Os.includes(element)))
+        //console.log(`boardArray after loop pushing xes and os is ${gameBoard.boardArray}`)
+
+
+        for (i=0; i<winningCombinations.length;i++){//check winners & highlight fields
+            let fieldsToHighlight = [];     
+            if (winningCombinations[i].every(element => Os.includes(element))){//condense this code later into a single function because code is repeated
+                if (!testing){//highlight fields
+                    console.log(`teesting is ${testing}`)
+                    //console.log(`boardArray when highlighting runs ${gameBoard.boardArray}`)
+                    console.log("HIGHLIGHTS THE FIELDS ON THE SCREEN")
                     winningCombinations[i].forEach(element => fieldsToHighlight.push(document.getElementById(element)));
                     gameBoard.highlightFields(fieldsToHighlight)
-                    //extract the numbers that make the winning combination
-                    return players.one
-                    //endGame(players.one); moved it to fillField so this can be used for the minmax function
                 }
-                else if (winningCombinations[i].every(element => Xes.includes(element))){
+                //console.log(winningCombinations[i].every(element => Os.includes(element)))
+                console.log("one wins")
+                //extract the numbers that make the winning combination
+                //console.log(`boardArray right before declaring winner 1 ${gameBoard.boardArray}`)
+                return players.one
+                //endGame(players.one); moved it to fillField so this can be used for the minmax function
+            }
+            else if (winningCombinations[i].every(element => Xes.includes(element))){
+                if (!testing){//highlight fields
+                    //console.log(`boardArray when highlighting runs ${gameBoard.boardArray}`)
+                    console.log(`teesting is ${testing}`)
+                    console.log("HIGHLIGHTS THE FIELDS ON THE SCREEN")
                     winningCombinations[i].forEach(element => fieldsToHighlight.push(document.getElementById(element)));
                     gameBoard.highlightFields(fieldsToHighlight)
-                    return players.two
-                    //endGame(players.two);
                 }
+                // winningCombinations[i].forEach(element => fieldsToHighlight.push(document.getElementById(element)));
+                // gameBoard.highlightFields(fieldsToHighlight)
+                console.log("two wins")
+               // console.log(`boardArray right before declaring winner 2 ${gameBoard.boardArray}`)
+                return players.two
+                //endGame(players.two);
             }
         }
     }
@@ -409,7 +462,7 @@ const game = (function(){
             console.log("genius ai starts acting")
             let fields = document.getElementsByClassName("field");
 
-            //let testBoardState = gameBoard.getBoardArray();
+            
             //console.log(`test board state is ${testBoardState}`)
             
             function checkCurrentEmptyFields (boardState){
@@ -421,53 +474,57 @@ const game = (function(){
                 }
                 return emptyFields;
             }
-            
+            const allTestedPlays = [];//should also work inside the minimax function but DOES NOT
             function minimax(currentBoardState, sign){
                 console.log("minimax starts")
                 testing = true;
+                console.log(`testing after starting minimax is ${testing}`)
                 let availableFields = checkCurrentEmptyFields(currentBoardState);
-
+                console.log(`boardArray before checking if sb won in minimax is ${gameBoard.getBoardArray()}`)
                 if (checkIfSomeoneWon(currentBoardState)===players.one){
                     console.log('returns {score: -1}')
+                    //console.log(`boardArray after checking if sb won in minimax is ${gameBoard.boardArray}`)
                     return {score: -1};
                 }
                 else if (checkIfSomeoneWon(currentBoardState)===players.two){
                     console.log('returns {score: +1}')
+                    //console.log(`boardArray after checking if sb won in minimax is ${gameBoard.boardArray}`)
                     return {score: +1};
                 }
                 else if (checkIfSomeoneWon(currentBoardState)===null){
                     console.log("returns {score: 0}")
+                    //console.log(`boardArray after checking if sb won in minimax is ${gameBoard.boardArray}`)
                     return {score: 0};
                 }
-                const allTestedPlays = [];//should also work inside the minimax function but DOES NOT
+
                 console.log(`allTestedPlays right after definition is  ${JSON.stringify(allTestedPlays)}`)
                 
                 
                 for (k=0;k<availableFields.length;k++){// CHECKS ALL THE AVAILABLE FIELDS TO PUT IN THE SIGN///////////////////////////////////////////////////////////////
-                    // let testedSituation=[];//@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
+                    let testedSituation=[];//@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
 
-                    // for(j=0;j<currentBoardState.length;j++){//set up the tested situation through pushing the board state@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                    //     testedSituation.push(currentBoardState[j])  //puts the current board state in the tested situation array, the current board state is the parameter of the minimax func
-                    // }///@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
+                    for(j=0;j<currentBoardState.length;j++){//set up the tested situation through pushing the board state@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
+                        testedSituation.push(currentBoardState[j])  //puts the current board state in the tested situation array, the current board state is the parameter of the minimax func
+                    }///@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
 
                     let currentTestedPlay={};
                     currentTestedPlay.index=availableFields[k];//save the index of the currently processed field
                     
-                    //testedSituation[availableFields[k]]=sign;// TESTS THE SITUATION///////////////////////////////////////////////////////////////@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                    currentBoardState[availableFields[k]]=sign
+                    testedSituation[availableFields[k]]=sign;// TESTS THE SITUATION///////////////////////////////////////////////////////////////@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
+                    //currentBoardState[availableFields[k]]=sign
                     if (sign===players.two.sign){
-                       //const result = minimax(testedSituation, players.one.sign);//@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                       const result = minimax(currentBoardState, players.one.sign);
+                       const result = minimax(testedSituation, players.one.sign);//@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
+                       //const result = minimax(currentBoardState, players.one.sign);
                        currentTestedPlay.score=result.score;
                     }
                     else if (sign===players.one.sign){
-                        //const result = minimax(testedSituation, players.two.sign);//@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                        const result = minimax(currentBoardState, players.two.sign)
+                        const result = minimax(testedSituation, players.two.sign);//@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
+                        //const result = minimax(currentBoardState, players.two.sign)
                         currentTestedPlay.score=result.score;
                     }
-                    //testedSituation[availableFields[k]]=null// CLEAR THE CURRENTLY WORKED FIELD OF THE SYMBOL@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                    currentBoardState[availableFields[k]]=null 
-                    allTestedPlays.push(currentTestedPlay)
+                    testedSituation[availableFields[k]]=null// CLEAR THE CURRENTLY WORKED FIELD OF THE SYMBOL@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
+                    //currentBoardState[availableFields[k]]=null 
+                    allTestedPlays.push(currentTestedPlay);
                     console.log(`allTestedPlays after updatying is ${JSON.stringify(allTestedPlays)}`)
                 }
                 
@@ -495,21 +552,29 @@ const game = (function(){
                     console.log("SOMETHING WENT WRONG WITH ASSIGNING BEST PLAYS - NO SIGN IS ACTIVE APPARENTLY")
                 }
                 testing=false;
+                console.log(`testing inside minimax after it should have changed to false is ${testing}`)
                 console.log(`final allTestedPlays is ${JSON.stringify(allTestedPlays)}`)
                 return allTestedPlays[bestPlay];
             }
             console.log("before first minimax invoaction")
-            let bestFieldToPlay=minimax(gameBoard.getBoardArray(), players.two.sign)//first minimax invocation
+            console.log(`boardArray before selecting best field to play ${gameBoard.getBoardArray()}`)
+            let testBoardState = gameBoard.getBoardArray();
+            let bestFieldToPlay=minimax(testBoardState, players.two.sign)//first minimax invocation
             console.log("after first minimax invoaction")
             console.log(`best field to play ${JSON.stringify(bestFieldToPlay)}`);
             // console.log(bestFieldToPlay);
             // console.log(bestFieldToPlay.index);
             // console.log(fields)
-            
+            //console.log(`boardArray is ${gameBoard.boardArray}`)
             console.log(JSON.stringify(bestFieldToPlay));
-            console.log("now it would fill")
+            console.log("now it would fill");
+            //console.log(`boardArray before filling the field by minimax ${gameBoard.boardArray}`)
+            console.log(`board array before minimax changing a field is ${gameBoard.getBoardArray()}`)
             gameBoard.fillField(fields[bestFieldToPlay.index]);
-
+            //console.log(`boardArray after filling the field by minimax ${gameBoard.boardArray}`)
+            console.log("field filled by minimax");
+            console.log(`board array after minimax changing a field is ${gameBoard.getBoardArray()}`)
+            console.log(`teesting is ${testing}`)
             //random is like this V
             //gameBoard.fillField(fields[Math.floor(Math.random()*9)])
 
