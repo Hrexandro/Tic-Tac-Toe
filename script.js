@@ -10,6 +10,15 @@ each run, NOT SURE why this is the case however
 - regardless of the position of allTestedPlace, the AI still fills the first available field, regardless whether it's a good idea or not
 
 
+note 20.08.2021
+
+-rewrote minimax function from groundup
+-get cannot read property score of undefined error AGAIN
+TRY  TO:
+- not use currentBoardState throughout - push it into new array again
+- change getBoardState function to push the boardState into a new array instead of just returning it
+
+
 - display who has which symbol
 - make it look better
 -add choosing single or multiplayer
@@ -476,90 +485,72 @@ const game = (function(){
             }
             const allTestedPlays = [];//should also work inside the minimax function but DOES NOT
             function minimax(currentBoardState, sign){
-                console.log("minimax starts")
-                testing = true;
-                console.log(`testing after starting minimax is ${testing}`)
-                let availableFields = checkCurrentEmptyFields(currentBoardState);
-                console.log(`boardArray before checking if sb won in minimax is ${gameBoard.getBoardArray()}`)
+                let availableFields=checkCurrentEmptyFields(currentBoardState);
+
                 if (checkIfSomeoneWon(currentBoardState)===players.one){
-                    console.log('returns {score: -1}')
-                    //console.log(`boardArray after checking if sb won in minimax is ${gameBoard.boardArray}`)
-                    return {score: -1};
+                    return {score:-1};
                 }
                 else if (checkIfSomeoneWon(currentBoardState)===players.two){
-                    console.log('returns {score: +1}')
-                    //console.log(`boardArray after checking if sb won in minimax is ${gameBoard.boardArray}`)
-                    return {score: +1};
+                    return {score:1};
                 }
-                else if (checkIfSomeoneWon(currentBoardState)===null){
-                    console.log("returns {score: 0}")
-                    //console.log(`boardArray after checking if sb won in minimax is ${gameBoard.boardArray}`)
-                    return {score: 0};
+                else if (checkIfSomeoneWon(currentBoardState)===players.two){
+                    return {score:0};
                 }
 
-                console.log(`allTestedPlays right after definition is  ${JSON.stringify(allTestedPlays)}`)
-                
-                
-                for (k=0;k<availableFields.length;k++){// CHECKS ALL THE AVAILABLE FIELDS TO PUT IN THE SIGN///////////////////////////////////////////////////////////////
-                    let testedSituation=[];//@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
+                const allTestedPlays = [];
 
-                    for(j=0;j<currentBoardState.length;j++){//set up the tested situation through pushing the board state@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                        testedSituation.push(currentBoardState[j])  //puts the current board state in the tested situation array, the current board state is the parameter of the minimax func
-                    }///@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
+                for (j=0;j<checkCurrentEmptyFields(currentBoardState).length;j++){//changing of the iterator variable might be necessary
 
-                    let currentTestedPlay={};
-                    currentTestedPlay.index=availableFields[k];//save the index of the currently processed field
-                    
-                    testedSituation[availableFields[k]]=sign;// TESTS THE SITUATION///////////////////////////////////////////////////////////////@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                    //currentBoardState[availableFields[k]]=sign
+                    const currentTestedPlay = {};
+
+                    currentTestedPlay.index = currentBoardState[availableFields[j]];//might need to push the boardstate in a different variable;
+
+                    currentBoardState[availableFields[j]] = sign;//might need to push the boardstate in a different variable; //changing of the iterator variable might be necessary
+
                     if (sign===players.two.sign){
-                       const result = minimax(testedSituation, players.one.sign);//@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                       //const result = minimax(currentBoardState, players.one.sign);
-                       currentTestedPlay.score=result.score;
+                        const result = minimax(currentBoardState, players.one.sign)//might need to push the boardstate in a different variable; 
+
+                        currentTestedPlay.score = result.score;
                     }
-                    else if (sign===players.one.sign){
-                        const result = minimax(testedSituation, players.two.sign);//@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                        //const result = minimax(currentBoardState, players.two.sign)
-                        currentTestedPlay.score=result.score;
+                    else {
+                        const result = minimax(currentBoardState, players.two.sign)//might need to push the boardstate in a different variable; 
+
+                        currentTestedPlay.score = result.score;  
                     }
-                    testedSituation[availableFields[k]]=null// CLEAR THE CURRENTLY WORKED FIELD OF THE SYMBOL@@@Let us try using the currentBoardState all over instead of testedSituation see what happens
-                    //currentBoardState[availableFields[k]]=null 
+
+                    currentBoardState[availableFields[j]] = null//might need to push the boardstate in a different variable; //changing of the iterator variable might be necessary
+
                     allTestedPlays.push(currentTestedPlay);
-                    console.log(`allTestedPlays after updatying is ${JSON.stringify(allTestedPlays)}`)
+
                 }
-                
-                
-                let bestPlay = null;/////////////////////////////////////////////////////////////
-                if (sign===players.two.sign){//get the best play for the current player
+
+                let bestTestedPlay = null;
+
+                if (sign === players.two.sign){
                     let bestScore = -Infinity;
-                    for (l=0;l<allTestedPlays.length;l++){
-                        if (allTestedPlays[l].score>bestScore){
-                            bestScore = allTestedPlays[l].score;
-                            bestPlay = l;
+                    for (let k=0; k<allTestedPlays.length;k++){//changing of the iterator variable might be necessary
+                        if (allTestedPlays[k].score>bestScore){//changing of the iterator variable might be necessary
+                            bestScore = allTestedPlays[k].score;//changing of the iterator variable might be necessary
+                            bestTestedPlay = k//changing of the iterator variable might be necessary
                         }
                     }
-                }
-                else if (sign===players.one.sign){
-                    let bestScore = Infinity;
-                    for (l=0;l<allTestedPlays.length;l++){
-                        if (allTestedPlays[l].score<bestScore){
-                            bestScore = allTestedPlays[l].score;
-                            bestPlay = l;
-                        }
-                    }
+
                 }
                 else {
-                    console.log("SOMETHING WENT WRONG WITH ASSIGNING BEST PLAYS - NO SIGN IS ACTIVE APPARENTLY")
+                    let bestScore = Infinity;
+                    for (let k=0; k<allTestedPlays.length;k++){//changing of the iterator variable might be necessary
+                        if (allTestedPlays[k].score<bestScore){//changing of the iterator variable might be necessary
+                            bestScore = allTestedPlays[k].score;//changing of the iterator variable might be necessary
+                            bestTestedPlay = k//changing of the iterator variable might be necessary
+                        }
+                    }
                 }
-                testing=false;
-                console.log(`testing inside minimax after it should have changed to false is ${testing}`)
-                console.log(`final allTestedPlays is ${JSON.stringify(allTestedPlays)}`)
-                return allTestedPlays[bestPlay];
+                return allTestedPlays[bestTestedPlay];
             }
             console.log("before first minimax invoaction")
             console.log(`boardArray before selecting best field to play ${gameBoard.getBoardArray()}`)
             let testBoardState = gameBoard.getBoardArray();
-            let bestFieldToPlay=minimax(testBoardState, players.two.sign)//first minimax invocation
+            let bestFieldToPlay = minimax(testBoardState, players.two.sign)//first minimax invocation
             console.log("after first minimax invoaction")
             console.log(`best field to play ${JSON.stringify(bestFieldToPlay)}`);
             // console.log(bestFieldToPlay);
