@@ -18,6 +18,10 @@ TRY  TO:
 - not use currentBoardState throughout - push it into new array again
 - change getBoardState function to push the boardState into a new array instead of just returning it
 
+note 29.08.2021
+change medium to first move corner, if first oponent move is corner fill center
+
+
 
 - display who has which symbol
 - make it look better
@@ -208,6 +212,14 @@ const gameBoard = (function(){
                 // playerTwoArea.innerHTML=`<h1 class="name" id="${'X'}">${players.two.name}</h1>`;
                 //ok now have it do something ie it is moves
             }
+            else if (e.target.getAttribute('id')==='medium'){
+                assignAIAttributes('medium');
+                // console.log("picks genius ai");
+                // players.assignName('genius AI', players.two);
+                // players.two.named = true;
+                // players.two.type="AI"
+                // playerTwoArea.innerHTML=`<h1 class="name" id="${'X'}">${players.two.name}</h1>`;
+            }
             else if (e.target.getAttribute('id')==='genius-ai'){
                 assignAIAttributes('genius-AI');
                 // console.log("picks genius ai");
@@ -364,15 +376,16 @@ const game = (function(){
     function checkIfSomeoneWon(boardState){//also keeps tally of picked fields
         let Xes = [];//those were outside of the function before, I am trying to change it to enable using it in the minimax function
         let Os = [];//without having to worry about it ending the actual game
-        //console.log(`boardArray at start of checkIfSomeoneWon ${gameBoard.boardArray}`)
+        
         console.log('check if sb won runs')
         console.log(`teesting when checking if someone won is ${testing}`)
-        if (!boardState.includes(null)){
-            //endGame(null)
-            console.log('no one wins')
-            return null;
 
-        }
+        // if (checkCurrentEmptyFields(boardState).length===0){
+        // //endGame(null)
+        // console.log('no one wins')
+        // return null;
+
+        // }
         console.log(`boardState when checking if someone won is ${boardState}`)
         //console.log(`boardArray before loop pushing xes and os is ${gameBoard.boardArray}`)
         for (i=0; i<boardState.length; i++) {//should not use the ACTUAL BOARD ARRAY but the currently tested boardState
@@ -424,6 +437,12 @@ const game = (function(){
                 return players.two
                 //endGame(players.two);
             }
+        }
+        if (!boardState.includes(null)){//if board state doesn't include null, hence no fields to pick, put this after checking the player-specific outcomes
+        //endGame(null)
+        console.log('no one wins')
+        return null;
+
         }
     }
 
@@ -477,33 +496,50 @@ const game = (function(){
         AIPlayerActCheck();
     }
 
+
+    function checkCurrentEmptyFields (boardState){
+        let emptyFields = []
+        console.log(`boardstate is ${boardState}`)
+        console.log(boardState.length)
+        for (i=0;i<boardState.length;i++){
+            if (boardState[i] === null){
+                emptyFields.push(i)
+            }
+        }
+        return emptyFields;
+    }
     function AIPlayerActCheck () {//checks if AI player acts and what type & makes the AI action
-        if (game.currentPlayer===players.two&&players.two.name==="mindless-AI"&&players.two.type==="AI"){
+        if (game.currentPlayer===players.two&&players.two.name==="mindless-AI"&&players.two.type==="AI"){//mindless, selects at random
             let fields = document.getElementsByClassName("field");//repeats, move before either option
             gameBoard.fillField(fields[Math.floor(Math.random()*9)])
         }
+        else if (game.currentPlayer===players.two&&players.two.name==="medium"&&players.two.type==="AI"){//selects with some sense
+            let fields = document.getElementsByClassName("field");//repeats, move before either option
+            let testedSituation = gameBoard.getBoardArray()
+            console.log(`testedsituation is ${testedSituation}`)
 
-        else if (game.currentPlayer===players.two&&players.two.name==="genius-AI"&&players.two.type==="AI"){
+            if (testedSituation[4]===null){// change medium to first move corner, if first oponent move is corner fill center
+                gameBoard.fillField(fields[4])
+            }
+            else {//if all else fails, just do random
+                gameBoard.fillField(fields[Math.floor(Math.random()*9)])
+            }
+
+        }
+
+        else if (game.currentPlayer===players.two&&players.two.name==="genius-AI"&&players.two.type==="AI"){//should be unbeatable - currently is NOT
             console.log("genius ai starts acting")
             let fields = document.getElementsByClassName("field");//repeats, move before either option
             testing=true;
             
             //console.log(`test board state is ${testBoardState}`)
             
-            function checkCurrentEmptyFields (boardState){
-                let emptyFields = []
-                for (i=0;i<boardState.length;i++){
-                    if (boardState[i] === null){
-                        emptyFields.push(i)
-                    }
-                }
-                return emptyFields;
-            }
-            const allTestedPlays = [];//should also work inside the minimax function but DOES NOT
+
+            let allTestedPlays = [];//should also work inside the minimax function but DOES NOT
             function minimax(currentBoardState, sign){
                 console.log("minimax is invoked")
                 let availableFields=checkCurrentEmptyFields(currentBoardState);
-
+                
                 if (checkIfSomeoneWon(currentBoardState)===players.one){
                     return {score:-1};
                 }
@@ -514,7 +550,7 @@ const game = (function(){
                     return {score:0};
                 }
 
-                const allTestedPlays = [];
+                //const allTestedPlays = [];
                 
                 //let testedSituation
                 // for (l=0;l<currentBoardState.length;l++){
@@ -528,9 +564,11 @@ const game = (function(){
                         testedSituation.push(currentBoardState[y]);
                     }
                     const currentTestedPlay = {};
-                    
-                    currentTestedPlay.index = testedSituation[availableFields[j]];//might need to push the boardstate in a different variable;
-
+                    //console.log(`currentTestedPlay is ${JSON.stringify(currentTestedPlay)} - should be {}, testedSituation is ${JSON.stringify(testedSituation)}, testedSituation[availableFields[j]] is ${JSON.stringify(testedSituation[availableFields[j]])}`)
+                    //console.log(`[j] is ${[j]}, availableFields is ${availableFields}, availableFields[j] is ${availableFields[j]}`)
+                    //currentTestedPlay.index = testedSituation[availableFields[j]];//doing this one according to site is a problem, because empty fields in the array are null, not the field index
+                    currentTestedPlay.index = availableFields[j]//might need to push the boardstate in a different variable;
+                    //console.log(`currentTestedPlay.index is ${JSON.stringify(currentTestedPlay.index)}, after assigning`)
                     testedSituation[availableFields[j]] = sign;//might need to push the boardstate in a different variable; //changing of the iterator variable might be necessary
 
                     if (sign===players.two.sign){
@@ -543,10 +581,12 @@ const game = (function(){
 
                         currentTestedPlay.score = result.score;  
                     }
-
+                    
                     testedSituation[availableFields[j]] = null//might need to push the boardstate in a different variable; //changing of the iterator variable might be necessary
-
+                    
+                    console.log(`alltestedplays before pushing is ${JSON.stringify(allTestedPlays)}`)
                     allTestedPlays.push(currentTestedPlay);
+                    console.log(`alltestedplays is ${JSON.stringify(allTestedPlays)}`)
 
                 }
 
@@ -579,6 +619,7 @@ const game = (function(){
                 console.log(`all tested plays is ${JSON.stringify(allTestedPlays)}, bestPlay is ${JSON.stringify(bestPlay)}, allTestedPlays[bestPlay] is ${JSON.stringify(allTestedPlays[bestPlay])}`)
                 testing=false;
                 return allTestedPlays[bestPlay];
+
             }
             console.log("before first minimax invoaction")
             console.log(`boardArray before first invoking minimax is ${gameBoard.getBoardArray()}`)
