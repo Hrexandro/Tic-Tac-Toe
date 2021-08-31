@@ -132,9 +132,23 @@ const gameBoard = (function(){
         console.log(game.postGame)
         fillField(event.target);
     }
+
+    let lastFilledField = {};
+
+    function getLastFilledField(){
+        return lastFilledField
+    }
+
+    function resetLastFilledField() {
+        lastFilledField.sign = null
+        lastFilledField.field = null
+    }
     
     function fillField(field){//used to click field both when clicked and when the AI does its thing
         if (field.innerText===""&&game.getPostGame()===false){//if field is empty and we are not in the aftermath of a game
+            lastFilledField.field = field.getAttribute('id');
+            lastFilledField.sign = game.currentPlayer.sign
+            console.log(JSON.stringify(lastFilledField))
             console.log(game.currentPlayer)
             console.log(players.one)
             field.innerText = `${game.currentPlayer.sign}`;
@@ -270,6 +284,8 @@ const gameBoard = (function(){
         fillField,
         getBoardArray,
         highlightFields,
+        getLastFilledField,
+        resetLastFilledField,
     }
 
 })();
@@ -377,8 +393,8 @@ const game = (function(){
         let Xes = [];//those were outside of the function before, I am trying to change it to enable using it in the minimax function
         let Os = [];//without having to worry about it ending the actual game
         
-        console.log('check if sb won runs')
-        console.log(`teesting when checking if someone won is ${testing}`)
+       // console.log('check if sb won runs')
+       // console.log(`teesting when checking if someone won is ${testing}`)
 
         // if (checkCurrentEmptyFields(boardState).length===0){
         // //endGame(null)
@@ -391,14 +407,14 @@ const game = (function(){
         for (i=0; i<boardState.length; i++) {//should not use the ACTUAL BOARD ARRAY but the currently tested boardState
             if (boardState[i]==="O"&&!Os.includes(i)){
                 //console.log(i)
-                console.log(`Os is ${Os}`);
+                //console.log(`Os is ${Os}`);
                 Os.push(i);
-                console.log(`Os is ${Os}`);
+                //console.log(`Os is ${Os}`);
             }
             else if (boardState[i]==="X"&&!Xes.includes(i)){
-                console.log(`Xes is ${Xes}`);
+                //console.log(`Xes is ${Xes}`);
                 Xes.push(i);
-                console.log(`Xes is ${Xes}`);
+                //console.log(`Xes is ${Xes}`);
                 //console.log(i)
             }
         }
@@ -449,6 +465,10 @@ const game = (function(){
     function endGame(winner){
 
         console.log(postGame);
+        console.log(`last filled field before reset is ${JSON.stringify(gameBoard.getLastFilledField())}`);
+        gameBoard.resetLastFilledField();
+        console.log(`last filled field after reset is ${JSON.stringify(gameBoard.getLastFilledField())}`);
+        console.log(`last filled field after reset equals {} ${gameBoard.getLastFilledField()=={}}`);
         setPostGame(true);
         console.log(postGame);
         gameBoard.addNewGameButton();
@@ -517,10 +537,17 @@ const game = (function(){
             let fields = document.getElementsByClassName("field");//repeats, move before either option
             let testedSituation = gameBoard.getBoardArray()
             console.log(`testedsituation is ${testedSituation}`)
-
-            if (testedSituation[4]===null){// change medium to first move corner, if first oponent move is corner fill center
+            let corners = [0,2,6,8]
+            if (gameBoard.getLastFilledField().sign===null&&gameBoard.getLastFilledField().field===null){//no field filled start with corner
+                gameBoard.fillField(fields[corners[Math.floor(Math.random()*corners.length)]]);
+            }
+            else if (testedSituation[4]===null){// if second move fill center
                 gameBoard.fillField(fields[4])
             }
+            //add another else if - if you are one move from winning, do the winning move
+            //add another else if - if the opponent is one move away from a winning combination, block him
+            //go one by one through winning combination, for each check if two of the fields are marked by the same sign, if they are, fill the third
+
             else {//if all else fails, just do random
                 gameBoard.fillField(fields[Math.floor(Math.random()*9)])
             }
