@@ -537,8 +537,49 @@ const game = (function(){
             let fields = document.getElementsByClassName("field");//repeats, move before either option
             let testedSituation = gameBoard.getBoardArray()
             console.log(`testedsituation is ${testedSituation}`)
+            
+            function checkIfSomebodyIsOneStepFromWinning(){//finish writing this //if you are one step from winning, do it, if the enemy is, block him
+                
+                console.log("check if somebody is one step runs")
+                for (i=0;i<winningCombinations.length;i++){
+                    let currentTestedSet = winningCombinations[i];
+                    //let combinationOfSigns = []
+                    for (j=0, Xes = [], Os = [], empties = [];j<currentTestedSet.length;j++){//currenttestedset ex [0,1,2]
+                        console.log(`current tested set is ${currentTestedSet}`)
+                        if (gameBoard.getBoardArray()[currentTestedSet[j]]==="X"){
+                            Xes.push(currentTestedSet[j])
+                        }
+                        else if (gameBoard.getBoardArray()[currentTestedSet[j]]==="O"){
+                            Os.push(currentTestedSet[j])
+                        }
+                        else if (gameBoard.getBoardArray()[currentTestedSet[j]]===null){
+                            console.log(`${currentTestedSet[j]} is pushed into empties`)
+                            empties.push(currentTestedSet[j])
+                        }
+                        console.log(`one step check x ${Xes}, o ${Os}, empties ${empties},`)
+                        if ((Xes.length>1||Os.length>1)&&empties.length>0){//change to prioritise winning over blocking
+                            console.log(`emptties is ${empties}`)
+                            return empties
+                            //gameBoard.fillField(fields[empties[0]])
+                        }
+                        
+
+                        // if currenTestedSet[]//fuck it do it another time
+                        // if the position is not null then push into STRING
+                        // if string position 0===str pos 1 OR str pos 2, or str pos 1===pos 2, then the leftover number should be filled or something
+                    }
+                }
+                //return {result: false, field: null}
+            }
+
+            console.log(checkIfSomebodyIsOneStepFromWinning())
             let corners = [0,2,6,8]
-            if (gameBoard.getLastFilledField().sign===null&&gameBoard.getLastFilledField().field===null){//no field filled start with corner
+            if (checkIfSomebodyIsOneStepFromWinning()){
+                console.log("one step is true")
+                gameBoard.fillField(fields[checkIfSomebodyIsOneStepFromWinning()[0]])
+            }
+
+            else if (gameBoard.getLastFilledField().sign===null&&gameBoard.getLastFilledField().field===null){//no field filled start with corner
                 gameBoard.fillField(fields[corners[Math.floor(Math.random()*corners.length)]]);
             }
             else if (testedSituation[4]===null){// if second move fill center
@@ -547,6 +588,7 @@ const game = (function(){
             //add another else if - if you are one move from winning, do the winning move
             //add another else if - if the opponent is one move away from a winning combination, block him
             //go one by one through winning combination, for each check if two of the fields are marked by the same sign, if they are, fill the third
+
 
             else {//if all else fails, just do random
                 gameBoard.fillField(fields[Math.floor(Math.random()*9)])
