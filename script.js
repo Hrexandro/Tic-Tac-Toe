@@ -32,6 +32,10 @@ change medium to first move corner, if first oponent move is corner fill center
 - check if sb won also udates the board, finishing the game even in minimax simulation mode
 
 
+TO DO: 06.09.2021
+- change getBestPickAvailable to not run twice (once for confirmation, once for assignment)
+- use getBestPickAvailable to create a intermediate difficulty (can beat AI if you have two options at the same time - second move would've to be non-corner)
+- get the crucial move to randomize the corner
 
 
 
@@ -562,19 +566,20 @@ const game = (function () {
                             return empties//empties are the field to fill for correct gaming
 
                         }
-                        else if (Os.length > 1 && empties.length > 0) {//the best option, you pick the winning field
+                        else if (Os.length > 1 && empties.length > 0) {//second best option, you block the opponent
                             console.log(`emptties is ${empties}`)
                             betterPick=empties//empties are the field to fill for correct gaming
 
                         }
-                        else if (Xes.length===1 && empties.length > 0) {//the best option, you pick the winning field
+                        else if (Xes.length===1 && empties.length > 1) {//you arrange a row of your symbols, empties longer than 1 ensures that the enemy does not occupy your way
                             console.log(`emptties is ${empties}`)
                             goodPick=empties//empties are the field to fill for correct gaming
                         }
                     }
                 }
-                console.log(`betterPick= ${betterPick} betterPick!==[] ${betterPick!==[]};(goodPickPick!==[]) ${(goodPick!==[])} ; goodPick= ${goodPick}`)
-                console.log(betterPick.length)
+                //console.log(`betterPick= ${betterPick} betterPick!==[] ${betterPick!==[]};(goodPickPick!==[]) ${(goodPick!==[])} ; goodPick= ${goodPick}`)
+                console.log(`betterPick.length is ${betterPick.length}`)
+                console.log(`betterPick.length is ${goodPick.length}`)
                 if (betterPick.length>0){
                     return betterPick;
                 }
@@ -582,6 +587,7 @@ const game = (function () {
                     return goodPick;
                 }
                 else {
+                    console.log("Get best pick available returns false")
                     return false;
                 }
             }
@@ -594,9 +600,18 @@ const game = (function () {
             else if (gameBoard.getLastFilledField().sign === null && gameBoard.getLastFilledField().field === null) {//no field filled start with corner
                 gameBoard.fillField(fields[corners[Math.floor(Math.random() * corners.length)]]);
             }
-            else if (testedSituation[4] === null) {// if second move fill center
+            else if (testedSituation[4] === null) {// if second move & center empty fill center
                 gameBoard.fillField(fields[4])
             }
+            else if (corners.some((element)=>{return gameBoard.getBoardArray()[element]===null})){
+                console.log("it found an empty corner")
+                let availableCorners = corners.filter((element)=>{return gameBoard.getBoardArray()[element]===null})
+                console.log(`availablecorners is ${availableCorners}`)
+                gameBoard.fillField(fields[availableCorners[Math.floor(Math.random() * availableCorners.length)]])
+            }
+            // else if (gameBoard.getBoardArray()[corners[0]]===null){//if any of the corners is unfilled - fill a field in a corner - this makes it unbeatable
+            //     gameBoard.fillField(fields[corners[0]]);
+            // }
             else {//if all else fails, just do random
                 console.log("medium AI is doing random for some reason")
                 gameBoard.fillField(fields[Math.floor(Math.random() * 9)])
