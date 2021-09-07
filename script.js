@@ -31,11 +31,19 @@ change medium to first move corner, if first oponent move is corner fill center
 - animate symbols appearing
 - check if sb won also udates the board, finishing the game even in minimax simulation mode
 
-
+..through second pick always being a corner, if not the middle
 TO DO: 06.09.2021
 - change getBestPickAvailable to not run twice (once for confirmation, once for assignment)
 - use getBestPickAvailable to create a intermediate difficulty (can beat AI if you have two options at the same time - second move would've to be non-corner)
 - get the crucial move to randomize the corner
+
+Improve getBestPickAvailable() function into unbeatability
+TO DO: 07.09.2021
+- check which conditionals are redundant and delete appropriately
+- move the getBestPickAvailable() outside of medium difficulty
+- add impossible difficulty
+- throw away the minimax function which doesn't work anyway
+- set getBestPickAvailable() to serve as both medium and impossible difficulty
 
 
 
@@ -545,6 +553,9 @@ const game = (function () {
             function getBestPickAvailable() {
                 let goodPick=[];
                 let betterPick=[];
+                let bestPick=[];
+                let corners = [0, 2, 6, 8];
+                let nonCorners = [1, 3, 4, 5, 7];
                 console.log("check if somebody is one step runs")
                 for (i = 0; i < winningCombinations.length; i++) {//goes through tested sets //Pick to be updated if a better pick is found
                     let currentTestedSet = winningCombinations[i];
@@ -563,7 +574,7 @@ const game = (function () {
                         console.log(`one step check x ${Xes}, o ${Os}, empties ${empties},`)
                         if (Xes.length > 1 && empties.length > 0) {//the best option, you pick the winning field
                             console.log(`emptties is ${empties}`)
-                            return empties//empties are the field to fill for correct gaming
+                            bestPick=empties//empties are the field to fill for correct gaming
 
                         }
                         else if (Os.length > 1 && empties.length > 0) {//second best option, you block the opponent
@@ -580,42 +591,58 @@ const game = (function () {
                 //console.log(`betterPick= ${betterPick} betterPick!==[] ${betterPick!==[]};(goodPickPick!==[]) ${(goodPick!==[])} ; goodPick= ${goodPick}`)
                 console.log(`betterPick.length is ${betterPick.length}`)
                 console.log(`betterPick.length is ${goodPick.length}`)
+                if (bestPick.length>0){
+                    //return betterPick;
+                    console.log(`bestPick is ${bestPick}`)
+                    gameBoard.fillField(fields[bestPick[0]])
+                }
                 if (betterPick.length>0){
-                    return betterPick;
+                    //return betterPick;
+                    console.log(`betterPick is ${betterPick}`)
+                    gameBoard.fillField(fields[betterPick[0]])
                 }
-                else if (goodPick.length>0){
-                    return goodPick;
+                else if (gameBoard.getLastFilledField().sign === null && gameBoard.getLastFilledField().field === null) {//no field filled start with corner
+                    gameBoard.fillField(fields[corners[Math.floor(Math.random() * corners.length)]]);
                 }
-                else {
-                    console.log("Get best pick available returns false")
-                    return false;
-                }
-            }
-            let corners = [0, 2, 6, 8]
-            if (getBestPickAvailable()) {
-                console.log("getBestPickAvailable is true")
-                gameBoard.fillField(fields[getBestPickAvailable()[0]])
-            }
+                else if (testedSituation[4] === null) {// if second move after first pick being corner & center empty fill center
+                    gameBoard.fillField(fields[4])//might be redudant with the noncorners and blocking active
+                }//Vthis one should test if the opponent has two picked corners
 
-            else if (gameBoard.getLastFilledField().sign === null && gameBoard.getLastFilledField().field === null) {//no field filled start with corner
-                gameBoard.fillField(fields[corners[Math.floor(Math.random() * corners.length)]]);
-            }
-            else if (testedSituation[4] === null) {// if second move & center empty fill center
-                gameBoard.fillField(fields[4])
-            }
-            else if (corners.some((element)=>{return gameBoard.getBoardArray()[element]===null})){
-                console.log("it found an empty corner")
-                let availableCorners = corners.filter((element)=>{return gameBoard.getBoardArray()[element]===null})
-                console.log(`availablecorners is ${availableCorners}`)
-                gameBoard.fillField(fields[availableCorners[Math.floor(Math.random() * availableCorners.length)]])
-            }
-            // else if (gameBoard.getBoardArray()[corners[0]]===null){//if any of the corners is unfilled - fill a field in a corner - this makes it unbeatable
-            //     gameBoard.fillField(fields[corners[0]]);
-            // }
-            else {//if all else fails, just do random
-                console.log("medium AI is doing random for some reason")
-                gameBoard.fillField(fields[Math.floor(Math.random() * 9)])
-            }
+
+                /////NECESSARY FOR UNBEATABILITYvvvv
+                else if (corners.filter((element)=>{return gameBoard.getBoardArray()[element]==="O"}).length>1){//if opponent has two corners, and center is picked, blocking is solved earlier
+                    //also THE NON corner has to be empty
+                    //let availableNonCorners = checkCurrentEmptyFields(gameBoard.getBoardArray()).filter((element)=>{return !corners.includes(element)})
+                    let availableNonCorners = nonCorners.filter((element)=>{return gameBoard.getBoardArray()[element]===null})
+                    console.log(`availableNonCorners is ${availableNonCorners}`)
+                    gameBoard.fillField(fields[availableNonCorners[Math.floor(Math.random() * availableNonCorners.length)]])
+                }
+                else if (goodPick.length>0){//this goes after the anti-double tactics, build your line, perhaps this is unnecessary
+                    //return goodPick;
+                    console.log(`goodPick is ${goodPick}`)
+                    gameBoard.fillField(fields[goodPick[0]])
+                }
+                /////NECESSARY FOR UNBEATABILITYvvvv
+                else if (corners.some((element)=>{return gameBoard.getBoardArray()[element]===null})){//if there is an empty corner, pick a corner
+                    console.log("it found an empty corner")
+                    let availableCorners = corners.filter((element)=>{return gameBoard.getBoardArray()[element]===null})
+                    console.log(`availablecorners is ${availableCorners}`)
+                    gameBoard.fillField(fields[availableCorners[Math.floor(Math.random() * availableCorners.length)]])
+                }
+
+                else {//if all else fails, just do random
+                    console.log("medium AI is doing random for some reason")
+                    gameBoard.fillField(fields[Math.floor(Math.random() * 9)])
+                }
+
+                // else {
+                //     console.log("getbestpickAvailable did not fill any fields for some reason")
+                //     return false;
+                // }
+            }//here ends getBestPickAvailable///////////////////////////////////////////////////////
+            getBestPickAvailable();
+
+
         }
 
         else if (game.currentPlayer === players.two && players.two.name === "genius-AI" && players.two.type === "AI") {//should be unbeatable - currently is NOT
