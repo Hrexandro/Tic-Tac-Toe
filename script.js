@@ -2,54 +2,12 @@
 
 TO DO:
 
-
-note 19.08.2021
--fixed the bug that cause boardArray to be filled when running the minimax simulation, it was because I tried using currentBoardState throughout, instead of substituting it with testBoardState in
-each run, NOT SURE why this is the case however
-- allTestedPlays still is reset and holds only one value with each recurrence if inside the minimax function
-- regardless of the position of allTestedPlace, the AI still fills the first available field, regardless whether it's a good idea or not
-
-
-note 20.08.2021
-
--rewrote minimax function from groundup
--get cannot read property score of undefined error AGAIN
-TRY  TO:
-- not use currentBoardState throughout - push it into new array again
-- change getBoardState function to push the boardState into a new array instead of just returning it
-
-note 29.08.2021
-change medium to first move corner, if first oponent move is corner fill center
-
-
-
-- display who has which symbol
-- make it look better
--add choosing single or multiplayer
--program the AI
-
-- animate symbols appearing
-- check if sb won also udates the board, finishing the game even in minimax simulation mode
-
-..through second pick always being a corner, if not the middle
-TO DO: 06.09.2021
-- change getBestPickAvailable to not run twice (once for confirmation, once for assignment)
-- use getBestPickAvailable to create a intermediate difficulty (can beat AI if you have two options at the same time - second move would've to be non-corner)
-- get the crucial move to randomize the corner
-
-Improve getBestPickAvailable() function into unbeatability
 TO DO: 07.09.2021
 - check which conditionals are redundant and delete appropriately
 - move the getBestPickAvailable() outside of medium difficulty
 - add impossible difficulty
 - throw away the minimax function which doesn't work anyway
 - set getBestPickAvailable() to serve as both medium and impossible difficulty
-
-
-
-- at start both name pickers should be hidden (add a hidden class that then gets removed)
-- after picking button they should become visible (only one if against AI - otherwise the computer name is appear)
-- then the gameboard -now it is ok
 
 make the code more concise
 check what other users made
@@ -540,230 +498,116 @@ const game = (function () {
         }
         return emptyFields;
     }
+    
+    function getBestPickAvailable(difficulty) {
+        let testedSituation = gameBoard.getBoardArray()
+        let goodPick=[];
+        let betterPick=[];
+        let bestPick=[];
+        let corners = [0, 2, 6, 8];
+        let nonCorners = [1, 3, 4, 5, 7];
+        console.log("check if somebody is one step runs")
+        for (i = 0; i < winningCombinations.length; i++) {//goes through tested sets //Pick to be updated if a better pick is found
+            let currentTestedSet = winningCombinations[i];
+            for (j = 0, Xes = [], Os = [], empties = []; j < currentTestedSet.length; j++) {//test the current set for being near winning currenttestedset ex [0,1,2]
+                console.log(`current tested set is ${currentTestedSet}`)
+                if (gameBoard.getBoardArray()[currentTestedSet[j]] === "X") {
+                    Xes.push(currentTestedSet[j])
+                }
+                else if (gameBoard.getBoardArray()[currentTestedSet[j]] === "O") {
+                    Os.push(currentTestedSet[j])
+                }
+                else if (gameBoard.getBoardArray()[currentTestedSet[j]] === null) {
+                    console.log(`${currentTestedSet[j]} is pushed into empties`)
+                    empties.push(currentTestedSet[j])
+                }
+                console.log(`one step check x ${Xes}, o ${Os}, empties ${empties},`)
+                if (Xes.length > 1 && empties.length > 0) {//the best option, you pick the winning field
+                    console.log(`emptties is ${empties}`)
+                    bestPick=empties//empties are the field to fill for correct gaming
+
+                }
+                else if (Os.length > 1 && empties.length > 0) {//second best option, you block the opponent
+                    console.log(`emptties is ${empties}`)
+                    betterPick=empties//empties are the field to fill for correct gaming
+
+                }
+                else if (Xes.length===1 && empties.length > 1) {//you arrange a row of your symbols, empties longer than 1 ensures that the enemy does not occupy your way
+                    console.log(`emptties is ${empties}`)
+                    goodPick=empties//empties are the field to fill for correct gaming
+                }
+            }
+        }
+        //console.log(`betterPick= ${betterPick} betterPick!==[] ${betterPick!==[]};(goodPickPick!==[]) ${(goodPick!==[])} ; goodPick= ${goodPick}`)
+        console.log(`betterPick.length is ${betterPick.length}`)
+        console.log(`betterPick.length is ${goodPick.length}`)
+        if (bestPick.length>0){
+            //return betterPick;
+            console.log(`bestPick is ${bestPick}`)
+            gameBoard.fillField(fields[bestPick[0]])
+        }
+        if (betterPick.length>0){
+            //return betterPick;
+            console.log(`betterPick is ${betterPick}`)
+            gameBoard.fillField(fields[betterPick[0]])
+        }
+        else if (gameBoard.getLastFilledField().sign === null && gameBoard.getLastFilledField().field === null) {//no field filled start with corner
+            gameBoard.fillField(fields[corners[Math.floor(Math.random() * corners.length)]]);
+        }
+        else if (testedSituation[4] === null) {// if second move after first pick being corner & center empty fill center
+            gameBoard.fillField(fields[4])//might be redudant with the noncorners and blocking active
+        }//Vthis one should test if the opponent has two picked corners
+
+
+        /////NECESSARY FOR UNBEATABILITYvvvv
+        else if (difficulty==="hard"&&corners.filter((element)=>{return gameBoard.getBoardArray()[element]==="O"}).length>1){//if opponent has two corners, and center is picked, blocking is solved earlier
+            //also THE NON corner has to be empty
+            //let availableNonCorners = checkCurrentEmptyFields(gameBoard.getBoardArray()).filter((element)=>{return !corners.includes(element)})
+            let availableNonCorners = nonCorners.filter((element)=>{return gameBoard.getBoardArray()[element]===null})
+            console.log(`availableNonCorners is ${availableNonCorners}`)
+            gameBoard.fillField(fields[availableNonCorners[Math.floor(Math.random() * availableNonCorners.length)]])
+        }
+        else if (goodPick.length>0){//this goes after the anti-double tactics, build your line, perhaps this is unnecessary
+            //return goodPick;
+            console.log(`goodPick is ${goodPick}`)
+            gameBoard.fillField(fields[goodPick[0]])
+        }
+        /////NECESSARY FOR UNBEATABILITYvvvv
+        else if (difficulty==="hard"&&corners.some((element)=>{return gameBoard.getBoardArray()[element]===null})){//if there is an empty corner, pick a corner
+            console.log("it found an empty corner")
+            let availableCorners = corners.filter((element)=>{return gameBoard.getBoardArray()[element]===null})
+            console.log(`availablecorners is ${availableCorners}`)
+            gameBoard.fillField(fields[availableCorners[Math.floor(Math.random() * availableCorners.length)]])
+        }
+
+        else {//if all else fails, just do random
+            console.log("medium AI is doing random for some reason")
+            gameBoard.fillField(fields[Math.floor(Math.random() * 9)])
+        }
+
+        // else {
+        //     console.log("getbestpickAvailable did not fill any fields for some reason")
+        //     return false;
+        // }
+    }//here ends getBestPickAvailable///////////////////////////////////////////////////////
+    let fields = document.getElementsByClassName("field");
     function AIPlayerActCheck() {//checks if AI player acts and what type & makes the AI action
         if (game.currentPlayer === players.two && players.two.name === "mindless-AI" && players.two.type === "AI") {//mindless, selects at random
-            let fields = document.getElementsByClassName("field");//repeats, move before either option
+            //repeats, move before either option
             gameBoard.fillField(fields[Math.floor(Math.random() * 9)])
         }
         else if (game.currentPlayer === players.two && players.two.name === "medium" && players.two.type === "AI") {//beatable only if you can win two ways at the same time
-            let fields = document.getElementsByClassName("field");//repeats, move before either option
-            let testedSituation = gameBoard.getBoardArray()
-            console.log(`testedsituation is ${testedSituation}`)
-
-            function getBestPickAvailable() {
-                let goodPick=[];
-                let betterPick=[];
-                let bestPick=[];
-                let corners = [0, 2, 6, 8];
-                let nonCorners = [1, 3, 4, 5, 7];
-                console.log("check if somebody is one step runs")
-                for (i = 0; i < winningCombinations.length; i++) {//goes through tested sets //Pick to be updated if a better pick is found
-                    let currentTestedSet = winningCombinations[i];
-                    for (j = 0, Xes = [], Os = [], empties = []; j < currentTestedSet.length; j++) {//test the current set for being near winning currenttestedset ex [0,1,2]
-                        console.log(`current tested set is ${currentTestedSet}`)
-                        if (gameBoard.getBoardArray()[currentTestedSet[j]] === "X") {
-                            Xes.push(currentTestedSet[j])
-                        }
-                        else if (gameBoard.getBoardArray()[currentTestedSet[j]] === "O") {
-                            Os.push(currentTestedSet[j])
-                        }
-                        else if (gameBoard.getBoardArray()[currentTestedSet[j]] === null) {
-                            console.log(`${currentTestedSet[j]} is pushed into empties`)
-                            empties.push(currentTestedSet[j])
-                        }
-                        console.log(`one step check x ${Xes}, o ${Os}, empties ${empties},`)
-                        if (Xes.length > 1 && empties.length > 0) {//the best option, you pick the winning field
-                            console.log(`emptties is ${empties}`)
-                            bestPick=empties//empties are the field to fill for correct gaming
-
-                        }
-                        else if (Os.length > 1 && empties.length > 0) {//second best option, you block the opponent
-                            console.log(`emptties is ${empties}`)
-                            betterPick=empties//empties are the field to fill for correct gaming
-
-                        }
-                        else if (Xes.length===1 && empties.length > 1) {//you arrange a row of your symbols, empties longer than 1 ensures that the enemy does not occupy your way
-                            console.log(`emptties is ${empties}`)
-                            goodPick=empties//empties are the field to fill for correct gaming
-                        }
-                    }
-                }
-                //console.log(`betterPick= ${betterPick} betterPick!==[] ${betterPick!==[]};(goodPickPick!==[]) ${(goodPick!==[])} ; goodPick= ${goodPick}`)
-                console.log(`betterPick.length is ${betterPick.length}`)
-                console.log(`betterPick.length is ${goodPick.length}`)
-                if (bestPick.length>0){
-                    //return betterPick;
-                    console.log(`bestPick is ${bestPick}`)
-                    gameBoard.fillField(fields[bestPick[0]])
-                }
-                if (betterPick.length>0){
-                    //return betterPick;
-                    console.log(`betterPick is ${betterPick}`)
-                    gameBoard.fillField(fields[betterPick[0]])
-                }
-                else if (gameBoard.getLastFilledField().sign === null && gameBoard.getLastFilledField().field === null) {//no field filled start with corner
-                    gameBoard.fillField(fields[corners[Math.floor(Math.random() * corners.length)]]);
-                }
-                else if (testedSituation[4] === null) {// if second move after first pick being corner & center empty fill center
-                    gameBoard.fillField(fields[4])//might be redudant with the noncorners and blocking active
-                }//Vthis one should test if the opponent has two picked corners
-
-
-                /////NECESSARY FOR UNBEATABILITYvvvv
-                else if (corners.filter((element)=>{return gameBoard.getBoardArray()[element]==="O"}).length>1){//if opponent has two corners, and center is picked, blocking is solved earlier
-                    //also THE NON corner has to be empty
-                    //let availableNonCorners = checkCurrentEmptyFields(gameBoard.getBoardArray()).filter((element)=>{return !corners.includes(element)})
-                    let availableNonCorners = nonCorners.filter((element)=>{return gameBoard.getBoardArray()[element]===null})
-                    console.log(`availableNonCorners is ${availableNonCorners}`)
-                    gameBoard.fillField(fields[availableNonCorners[Math.floor(Math.random() * availableNonCorners.length)]])
-                }
-                else if (goodPick.length>0){//this goes after the anti-double tactics, build your line, perhaps this is unnecessary
-                    //return goodPick;
-                    console.log(`goodPick is ${goodPick}`)
-                    gameBoard.fillField(fields[goodPick[0]])
-                }
-                /////NECESSARY FOR UNBEATABILITYvvvv
-                else if (corners.some((element)=>{return gameBoard.getBoardArray()[element]===null})){//if there is an empty corner, pick a corner
-                    console.log("it found an empty corner")
-                    let availableCorners = corners.filter((element)=>{return gameBoard.getBoardArray()[element]===null})
-                    console.log(`availablecorners is ${availableCorners}`)
-                    gameBoard.fillField(fields[availableCorners[Math.floor(Math.random() * availableCorners.length)]])
-                }
-
-                else {//if all else fails, just do random
-                    console.log("medium AI is doing random for some reason")
-                    gameBoard.fillField(fields[Math.floor(Math.random() * 9)])
-                }
-
-                // else {
-                //     console.log("getbestpickAvailable did not fill any fields for some reason")
-                //     return false;
-                // }
-            }//here ends getBestPickAvailable///////////////////////////////////////////////////////
-            getBestPickAvailable();
+            //let fields = document.getElementsByClassName("field");//repeats, move before either option
+            //let testedSituation = gameBoard.getBoardArray()
+           // console.log(`testedsituation is ${testedSituation}`)
+            getBestPickAvailable("medium");
 
 
         }
-
         else if (game.currentPlayer === players.two && players.two.name === "genius-AI" && players.two.type === "AI") {//should be unbeatable - currently is NOT
-            console.log("genius ai starts acting")
-            let fields = document.getElementsByClassName("field");//repeats, move before either option
-            testing = true;
-
-            //console.log(`test board state is ${testBoardState}`)
-
-
-            let allTestedPlays = [];//should also work inside the minimax function but DOES NOT
-            function minimax(currentBoardState, sign) {
-                console.log("minimax is invoked")
-                let availableFields = checkCurrentEmptyFields(currentBoardState);
-
-                if (checkIfSomeoneWon(currentBoardState) === players.one) {
-                    return { score: -1 };
-                }
-                else if (checkIfSomeoneWon(currentBoardState) === players.two) {
-                    return { score: +1 };
-                }
-                else if (checkIfSomeoneWon(currentBoardState) === null) {
-                    return { score: 0 };
-                }
-
-                //const allTestedPlays = [];
-
-                //let testedSituation
-                // for (l=0;l<currentBoardState.length;l++){
-
-                // }
-
-
-                for (j = 0; j < availableFields.length; j++) {//might need to push the boardstate in a different variable;//changing of the iterator variable might be necessary
-                    let testedSituation = [];
-                    for (y = 0; y < currentBoardState.length; y++) {
-                        testedSituation.push(currentBoardState[y]);
-                    }
-                    const currentTestedPlay = {};
-                    //console.log(`currentTestedPlay is ${JSON.stringify(currentTestedPlay)} - should be {}, testedSituation is ${JSON.stringify(testedSituation)}, testedSituation[availableFields[j]] is ${JSON.stringify(testedSituation[availableFields[j]])}`)
-                    //console.log(`[j] is ${[j]}, availableFields is ${availableFields}, availableFields[j] is ${availableFields[j]}`)
-                    //currentTestedPlay.index = testedSituation[availableFields[j]];//doing this one according to site is a problem, because empty fields in the array are null, not the field index
-                    currentTestedPlay.index = availableFields[j]//might need to push the boardstate in a different variable;
-                    //console.log(`currentTestedPlay.index is ${JSON.stringify(currentTestedPlay.index)}, after assigning`)
-                    testedSituation[availableFields[j]] = sign;//might need to push the boardstate in a different variable; //changing of the iterator variable might be necessary
-
-                    if (sign === players.two.sign) {
-                        const result = minimax(testedSituation, players.one.sign)//might need to push the boardstate in a different variable; 
-
-                        currentTestedPlay.score = result.score;
-                    }
-                    else {
-                        const result = minimax(testedSituation, players.two.sign)//might need to push the boardstate in a different variable; 
-
-                        currentTestedPlay.score = result.score;
-                    }
-
-                    testedSituation[availableFields[j]] = null//might need to push the boardstate in a different variable; //changing of the iterator variable might be necessary
-
-                    console.log(`alltestedplays before pushing is ${JSON.stringify(allTestedPlays)}`)
-                    allTestedPlays.push(currentTestedPlay);
-                    console.log(`alltestedplays is ${JSON.stringify(allTestedPlays)}`)
-
-                }
-
-                let bestPlay = null;
-                console.log(`sign is ${sign}`)
-                if (sign === players.two.sign) {
-                    let bestScore = -Infinity;
-                    for (let k = 0; k < allTestedPlays.length; k++) {//changing of the iterator variable might be necessary
-                        if (allTestedPlays[k].score > bestScore) {//changing of the iterator variable might be necessary
-                            console.log("assign something");
-                            bestScore = allTestedPlays[k].score;//changing of the iterator variable might be necessary
-                            bestPlay = k//changing of the iterator variable might be necessary
-                        }
-                    }
-
-                }
-                else if (sign === players.one.sign) {
-                    let bestScore = Infinity;
-                    for (let k = 0; k < allTestedPlays.length; k++) {//changing of the iterator variable might be necessary
-                        if (allTestedPlays[k].score < bestScore) {//changing of the iterator variable might be necessary
-                            console.log("assign something");
-                            bestScore = allTestedPlays[k].score;//changing of the iterator variable might be necessary
-                            bestPlay = k//changing of the iterator variable might be necessary
-                        }
-                    }
-                }
-                else {
-                    console.log("something went wrong when assigning bestscore")
-                }
-                console.log(`all tested plays is ${JSON.stringify(allTestedPlays)}, bestPlay is ${JSON.stringify(bestPlay)}, allTestedPlays[bestPlay] is ${JSON.stringify(allTestedPlays[bestPlay])}`)
-                testing = false;
-                return allTestedPlays[bestPlay];
-
-            }
-            console.log("before first minimax invoaction")
-            console.log(`boardArray before first invoking minimax is ${gameBoard.getBoardArray()}`)
-            //let testBoardState = gameBoard.getBoardArray();
-            let bestFieldToPlay = minimax(gameBoard.getBoardArray(), players.two.sign)//first minimax invocation
-            console.log("after first minimax invoaction")
-            console.log(`best field to play ${JSON.stringify(bestFieldToPlay)}`);
-            // console.log(bestFieldToPlay);
-            // console.log(bestFieldToPlay.index);
-            // console.log(fields)
-            //console.log(`boardArray is ${gameBoard.boardArray}`)
-            console.log(JSON.stringify(bestFieldToPlay));
-            console.log("now it would fill");
-            //console.log(`boardArray before filling the field by minimax ${gameBoard.boardArray}`)
-            console.log(`board array before minimax changing a field is ${gameBoard.getBoardArray()}`)
-
-            console.log(`fields is ${JSON.stringify(fields)}, bestFieldToPlay is ${JSON.stringify(bestFieldToPlay)}, bestFieldToPlay.index is ${JSON.stringify(bestFieldToPlay.index)}, fields[bestFieldToPlay.index] is ${JSON.stringify(fields[bestFieldToPlay.index])}`)
-            gameBoard.fillField(fields[bestFieldToPlay.index]);
-            //console.log(`boardArray after filling the field by minimax ${gameBoard.boardArray}`)
-            console.log("field filled by minimax");
-            console.log(`board array after minimax changing a field is ${gameBoard.getBoardArray()}`)
-            console.log(`teesting is ${testing}`)
-            //random is like this V
-            //gameBoard.fillField(fields[Math.floor(Math.random()*9)])
-
-
+            //let testedSituation = gameBoard.getBoardArray()
+            //console.log(`testedsituation is ${testedSituation}`)
+            getBestPickAvailable("hard");
         }
     }
 
