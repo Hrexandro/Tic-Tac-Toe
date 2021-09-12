@@ -16,10 +16,7 @@ const gameBoard = (function () {
     console.log(`boardArray at start is ${boardArray}`);
 
     function changeBoardArrayElement(ordinal, symbol) {
-        console.log("changeBoardArray Element Runs")
-        console.log(`boardArray before change is ${boardArray}`);
         boardArray[ordinal] = symbol;
-        console.log(`boardArray after change is ${boardArray}`);
     }
 
     let gameBoardElement = document.getElementById('game-board');
@@ -123,7 +120,6 @@ const gameBoard = (function () {
     let gameplayButtons = document.getElementsByClassName("gameplay-button");
 
     for (i = 0; i < gameplayButtons.length; i++) {
-        console.log(gameplayButtons[i])
         gameplayButtons[i].addEventListener('click', (e) => {
             gameBoardElement.removeChild(e.target.parentNode)
             toggleHidden(playerOneArea, playerTwoArea)
