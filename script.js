@@ -1,17 +1,8 @@
 /*
 TO DO:
-----------
-check which conditionals are redundant and delete appropriately
-
-remove revealed module parts that dont need to be revealed
-
-stop the elements on the site from twitching when score gets displayed/when player name is picked
-
-winning/tie messages
-
-BUG: Can't start new game despite clicking New Game Button - was not able to replicate
-
-
+-stop the elements on the site from twitching when score gets displayed/when player name is picked
+-winning/tie messages
+-BUG: Can't start new game despite clicking New Game Button - was not able to replicate
 */
 const gameBoard = (function () {
     let boardArray = [];
@@ -31,11 +22,6 @@ const gameBoard = (function () {
         console.log(`boardArray after change is ${boardArray}`);
     }
 
-    function getBoardArrayLength() {
-        return boardArray.length;
-    }
-
-    //display the gameBoard on the screen
     let gameBoardElement = document.getElementById('game-board');
     let centerColumnElement = document.getElementById('center-column');
 
@@ -91,21 +77,8 @@ const gameBoard = (function () {
         fillField(event.target);
     }
 
-    let lastFilledField = {};
-
-    function getLastFilledField() {
-        return lastFilledField
-    }
-
-    function resetLastFilledField() {
-        lastFilledField.sign = null
-        lastFilledField.field = null
-    }
-
     function fillField(field) {
         if (field.innerText === "" && game.getPostGame() === false) {//if field is empty and we are not in the aftermath of a game
-            lastFilledField.field = field.getAttribute('id');
-            lastFilledField.sign = game.currentPlayer.sign
             field.innerText = `${game.currentPlayer.sign}`;
             changeBoardArrayElement(field.getAttribute('id'), game.currentPlayer.sign);
             (game.currentPlayer === players.one) ? game.currentPlayer = players.two : game.currentPlayer = players.one;
@@ -183,30 +156,18 @@ const gameBoard = (function () {
 
     }
 
-    function getActualBoardArrayForTesting() {
-        console.log("getboardarray runs");
-        console.log(`boardArray when getting is ${boardArray}`)
-        return boardArray;
-
-    }
-
     return {
-        fillClickedField,
-        getBoardArrayLength,
         setUpBoard,
         addNewGameButton,
         clearGameBoard,
         clearBoardArray,
         removeNewGameButton,
-        getActualBoardArrayForTesting,//
         underlineActivePlayer,
         playerOneArea,
         playerTwoArea,
         fillField,
         getBoardArray,
         highlightFields,
-        getLastFilledField,
-        resetLastFilledField,
     }
 
 })();
@@ -269,7 +230,6 @@ const players = (function () {
         one,
         two,
         assignName,
-        replaceNameEntryFieldWithName,
     }
 })();
 
@@ -330,7 +290,6 @@ const game = (function () {
     }
 
     function endGame(winner) {
-        gameBoard.resetLastFilledField();
         setPostGame(true);
         gameBoard.addNewGameButton();
         gameBoard.underlineActivePlayer();
@@ -422,13 +381,10 @@ const game = (function () {
             console.log(`betterPick is ${betterPick}`)
             gameBoard.fillField(fields[betterPick[0]])
         }
-        // else if (gameBoard.getLastFilledField().sign === null && gameBoard.getLastFilledField().field === null) {//no field filled start with corner
-        //     gameBoard.fillField(fields[corners[Math.floor(Math.random() * corners.length)]]);
-        // }
+
         else if (testedSituation[4] === null) {// if second move after first pick being corner & center empty fill center
             gameBoard.fillField(fields[4])//might be redudant with the noncorners and blocking active
         }
-
 
         /////NECESSARY FOR UNBEATABILITYvvvv
         else if (difficulty==="hard"&&corners.filter((element)=>{return gameBoard.getBoardArray()[element]==="O"}).length>1&&nonCorners.filter((element)=>{return gameBoard.getBoardArray()[element]===null}).length>0){//if opponent has two corners, and center is picked, blocking is solved earlier
@@ -449,7 +405,6 @@ const game = (function () {
         }
 
         else {//if all else fails, just do random
-            
             gameBoard.fillField(fields[Math.floor(Math.random() * 9)])
         }
 
@@ -470,7 +425,6 @@ const game = (function () {
         currentPlayer,
         checkIfSomeoneWon,
         getPostGame,
-        setPostGame,
         checkIfBoardCanBeCreatedYet,
         startNewGame,
         AIPlayerActCheck,
