@@ -42,7 +42,9 @@ h1{
     margin:0;
 }
 
-
+p{
+    text-align: center;
+}
 
 .hidden{
     visibility:hidden;

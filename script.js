@@ -1,7 +1,6 @@
 /*
 TO DO:
--stop the elements on the site from twitching when score gets displayed/when player name is picked
--winning/tie messages
+-add winning/tie messages
 -BUG: Can't start new game despite clicking New Game Button - was not able to replicate
 */
 const gameBoard = (function () {
@@ -289,6 +288,10 @@ const game = (function () {
         setPostGame(true);
         gameBoard.addNewGameButton();
         gameBoard.underlineActivePlayer();
+        let winnerMessage = document.createElement('p');
+        winnerMessage.setAttribute('id','winner-message');
+        document.getElementById('center-column').appendChild(winnerMessage);
+        winnerMessage.textContent=`${winner.name} wins!`;
 
         if (winner != null) {//if it is not a tie
             winner.score++;
@@ -320,6 +323,7 @@ const game = (function () {
     }
 
     function startNewGame() {
+        document.getElementById('winner-message').remove();
         gameBoard.clearGameBoard();
         gameBoard.clearBoardArray();
         setPostGame(false);
