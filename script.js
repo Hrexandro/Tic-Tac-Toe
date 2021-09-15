@@ -75,7 +75,7 @@ const gameBoard = (function () {
 
     function fillField(field) {
         if (field.innerText === "" && game.getPostGame() === false) {//if field is empty and we are not in the aftermath of a game
-            field.innerText = `${game.currentPlayer.sign}`;
+            field.innerHTML = `<p class="appearing-symbol">${game.currentPlayer.sign}</p>`;
             changeBoardArrayElement(field.getAttribute('id'), game.currentPlayer.sign);
             (game.currentPlayer === players.one) ? game.currentPlayer = players.two : game.currentPlayer = players.one;
             underlineActivePlayer();

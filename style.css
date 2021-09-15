@@ -46,6 +46,7 @@ p{
     text-align: center;
 }
 
+
 .hidden{
     visibility:hidden;
 }
@@ -88,6 +89,12 @@ p{
     display: grid;
     grid-template-columns: 50px 50px 50px;
     grid-template-rows: 50px 50px 50px;
+
+}
+
+
+.appearing-symbol{
+    animation: lighten-up 0.2s linear;
 }
 
 .field{
@@ -98,8 +105,15 @@ p{
     height:98%;
     width:98%;
     color:black;
-    
+}
 
+@keyframes lighten-up {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .winning-combination{
