@@ -1,6 +1,5 @@
 /*
 TO DO:
--add winning/tie messages
 -BUG: Can't start new game despite clicking New Game Button - was not able to replicate
 */
 const gameBoard = (function () {
@@ -291,7 +290,15 @@ const game = (function () {
         let winnerMessage = document.createElement('p');
         winnerMessage.setAttribute('id','winner-message');
         document.getElementById('center-column').appendChild(winnerMessage);
-        winnerMessage.textContent=`${winner.name} wins!`;
+        if (winner===null){
+            winnerMessage.textContent = `It's a tie!`;
+        }
+        else if (winner.name==""){
+            winnerMessage.textContent=`Player ${winner.number} wins!`;
+        }
+        else {
+            winnerMessage.textContent=`${winner.name} wins!`;
+        }
 
         if (winner != null) {//if it is not a tie
             winner.score++;
