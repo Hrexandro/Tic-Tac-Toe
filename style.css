@@ -27,12 +27,12 @@ body{
     opacity: 1; /* Firefox */
   }
 
-#player-one-area, #player-two-area{
+/* #player-one-area, #player-two-area{
     width:20%;
-}
+} */
 
 input[type=text]{
-    width:7.5vw;
+    width:10.5em;
     border:none;
     outline: none;
     color:rgb(233, 128, 128);
@@ -71,7 +71,7 @@ p{
 
 .gameplay-button{
     margin:20px;
-    width:4vw;
+    width:5vw;
     height:9vh;
 
 }
